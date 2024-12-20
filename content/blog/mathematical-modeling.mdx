@@ -1,0 +1,42 @@
+---
+title: 'Mathematical Modeling in Finance'
+date: '2024-02-20'
+description: 'Exploring the intersection of mathematics and financial markets'
+---
+
+# Mathematical Modeling in Finance
+
+The intersection of mathematics and financial markets presents fascinating opportunities for research and application. Through my work at the Quantitative Finance Lab, I've explored various approaches to modeling market behavior.
+
+## CUSUM Filter Implementation
+
+One key area of my research involves the implementation of Symmetric CUSUM Filter for volatility analysis. This approach allows us to:
+- Detect anomalies in historical volatility time-series
+- Label data points using the Triple Barrier Approach
+- Optimize inputs for machine learning models
+
+```python
+def cusum_filter(data, threshold):
+    pos_cumsum = 0
+    neg_cumsum = 0
+    events = []
+    
+    for i in range(len(data)):
+        pos_cumsum = max(0, pos_cumsum + data[i])
+        neg_cumsum = min(0, neg_cumsum + data[i])
+        
+        if pos_cumsum > threshold:
+            events.append(i)
+            pos_cumsum = 0
+            neg_cumsum = 0
+        elif neg_cumsum < -threshold:
+            events.append(i)
+            pos_cumsum = 0
+            neg_cumsum = 0
+            
+    return events
+```
+
+## Future Directions
+
+The field of quantitative finance continues to evolve with advances in machine learning and computational power. My current research focuses on meta-strategy approaches to developing financial ML algorithms.
