@@ -1,3 +1,5 @@
+/* src/styles/global.css */
+
 /* Import the font (example using Google Fonts) */
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+1m:wght@300&display=swap');
 
@@ -61,6 +63,11 @@ h2 {
     font-size: 1.4rem;
     margin-top: 2rem;
 }
+/* Ensure first h2 in main content doesn't have extra top margin */
+main > h2:first-of-type {
+    margin-top: 0;
+}
+
 
 p {
   margin-bottom: 1rem;
@@ -68,7 +75,7 @@ p {
 
 ul, ol {
   margin-bottom: 1rem;
-  padding-left: 1.5rem; /* Indent lists */
+  padding-left: 1.5rem; /* Default indent for standard lists (not profile-list) */
 }
 
 li {
@@ -85,17 +92,27 @@ a:hover {
   color: #000;
 }
 
-/* Specific styles for lists like in the reference */
+/* Specific styles for lists like in the reference - CORRECTED ALIGNMENT */
 .profile-list {
-    list-style: none;
-    padding-left: 0;
+    list-style: none;  /* Remove the default browser bullet type */
+    padding-left: 0;   /* Remove default indentation from the <ul> */
+    margin-bottom: 1rem;
 }
+
+.profile-list li {
+    padding-left: 1.2em; /* Indent the text content of the list item */
+    position: relative;   /* Create positioning context for the ::before */
+    margin-bottom: 0.3rem;
+}
+
 .profile-list li::before {
-    content: "•"; /* Bullet point */
-    color: #aaa; /* Lighter color for bullet */
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em; /* Align bullet */
+    content: "•";         /* The bullet character */
+    color: #aaa;          /* Lighter color for bullet */
+    position: absolute;   /* Position it relative to the li */
+    left: 0;              /* Align it to the very left of the li's padding box */
+    top: 0;               /* Align near the top */
+    line-height: inherit; /* Match the line-height for vertical centering */
+    /* You might need a slight 'top' adjustment like 'top: 0.1em;' */
 }
 
 hr {
@@ -124,7 +141,15 @@ hr {
     display: flex; /* Layout date and title */
     flex-wrap: wrap;
     gap: 0 1rem; /* Gap between date and title */
+    /* Reset positioning context if needed, shouldn't conflict here */
+    position: static;
+    padding-left: 0; /* Override profile-list padding if somehow inherited */
 }
+/* Remove bullet from blog list items */
+.blog-list li::before {
+    content: none;
+}
+
 
 .blog-list time {
     color: #888;
@@ -144,8 +169,61 @@ pre {
     overflow-x: auto;
     margin-bottom: 1rem;
     font-size: 0.9em;
+    border: 1px solid #eee; /* Subtle border for code blocks */
+    border-radius: 3px;
 }
 
 code {
    font-family: 'M PLUS 1m', monospace; /* Ensure code uses mono font too */
+   /* Style inline code differently if needed */
+   /* background-color: #f8f8f8; */
+   /* padding: 0.1em 0.3em; */
+   /* border-radius: 3px; */
+}
+pre code {
+    /* Reset specific inline styles if applied */
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* Styles for content rendered from Markdown */
+main article img {
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem 0;
+    display: block; /* Ensure images are block elements */
+}
+main article h2,
+main article h3,
+main article h4,
+main article h5,
+main article h6 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+}
+/* Ensure lists within article content also get default padding */
+main article ul,
+main article ol {
+  padding-left: 1.5rem;
+}
+
+/* Ensure lists within article DO NOT get the profile-list bullet style */
+main article ul li::before,
+main article ol li::before {
+    content: ''; /* Override the profile-list bullet */
+    position: static; /* Reset positioning */
+}
+/* Let article lists use their default browser bullet/numbering */
+main article ul {
+    list-style: disc;
+}
+main article ol {
+    list-style: decimal;
+}
+/* Re-apply default padding/margin that might be overridden */
+main article li {
+    padding-left: 0;
+    position: static;
+    margin-bottom: 0.3rem;
 }
