@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import profileData from '../content/profile.json';
+---
+<BaseLayout title={`${profileData.name} - Contact`}>
+  <h2>contact</h2>
+  <p>
+    You can reach me via email at: <a href={`mailto:${profileData.contact.email}`}>{profileData.contact.email}</a>
+  </p>
+  <!-- Add other contact methods or a form here -->
+</BaseLayout>

@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import profileData from '../../content/profile.json';
+import { format } from 'date-fns';
+
+// Generate static paths for each blog post
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render(); // Get the rendered Markdown content
+---
+<BaseLayout title={`${entry.data.title} - ${profileData.name}`}>
+  <h1>{entry.data.title}</h1>
+  <p>
+    <time datetime={entry.data.pubDate.toISOString()}>
+      Published on {format(entry.data.pubDate, 'MMMM d, yyyy')}
+    </time>
+  </p>
+  <hr />
+  <article>
+    <Content /> {/* Render the Markdown content here */}
+  </article>
+</BaseLayout>
+
+<style is:global>
+  /* Add specific styles for blog post content if needed */
+  article img {
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem 0;
+  }
+  article h2, article h3, article h4 {
+     margin-top: 2.5rem;
+     margin-bottom: 1rem;
+  }
+</style>

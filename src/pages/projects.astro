@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import profileData from '../content/profile.json';
+---
+<BaseLayout title={`${profileData.name} - Projects`}>
+  <h2>projects</h2>
+  <p>Information about projects coming soon.</p>
+  <!--
+    Later, you could load project data from profile.json or separate markdown files
+    Example using profile.json:
+    <ul>
+      {profileData.projects.map(proj => (
+        <li><strong>{proj.title}:</strong> {proj.description}</li>
+      ))}
+    </ul>
+  -->
+</BaseLayout>

@@ -1,0 +1,43 @@
+{
+    "name": "Seongmin Chang",
+    "tagline": "AI Engineer @ Warmblood",
+    "contact": {
+      "email": "seongminc@warmblood.kr" 
+    },
+    "about": {
+      "introduction": "Hi I'm Seongmin¹, a software engineer in Singapore. I recently graduated from the National University of Singapore where I majored in Computer Science.",
+      "footnote": "[1] Pronounced sung (sing sang sung), min (mean)"
+    },
+    "currently": [
+      "learning how to be a full-time employee",
+      "settling in to my new home",
+      "planning for my wedding"
+    ],
+    "previously": {
+      "work": [
+        "Software Engineering Intern at Jane Street",
+        "Security Software Engineering Intern at Databricks",
+        "Software Engineering Intern at ByteDance / TikTok",
+        "Software Engineering Intern at Trail of Bits",
+        "Open Source Fellow at Facebook AI Research (FAIR) via the MLH Fellowship"
+      ],
+      "uoft": [
+        "Student"
+      ]
+    },
+    "interests": {
+      "main": "I spend most of my time working on things under the umbrella of CS. I used to compete in Security CTFs and Hackathons which somewhat reflects my CS interests, but I'm open to anything that I find cool.",
+      "other": "Back in High School, I was also heavily involved in Model United Nations, where I participated in more than 35 conferences in every academic capacity possible, and where I got the chance to visit new countries and stay in weird places, including the J.W. Marriott Beijing (for free) and a rented room with a cockroach problem in Kuala Lumpur (for a fee). All that remains is my love for travel.",
+      "likes": [
+        "GeoGuessr",
+        "Ball Sports (Basketball, Table Tennis, Football, Baseball)",
+        "British Quiz Shows (University Challenge, Only Connect, Countdown)",
+        "Systemic Functional Linguistics",
+        "Theatre & Musicals",
+        "My Fiancée"
+      ]
+    },
+    "projects": [ 
+      { "title": "Project 1", "description": "..." }
+    ]
+  }

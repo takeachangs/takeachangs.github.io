@@ -1,0 +1,34 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import '../styles/global.css'; // Import global styles
+
+interface Props {
+	title?: string; // Optional title prop
+}
+
+const { title = 'Kok Rui Wong' } = Astro.props; // Default title
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+
+    <!-- Preconnect for Google Fonts if used -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Link to M PLUS 1m Light (weight 300) -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1m:wght@300&display=swap" rel="stylesheet">
+
+	</head>
+	<body>
+    <Sidebar />
+		<main>
+			<slot /> {/* Page content will be injected here */}
+		</main>
+	</body>
+</html>

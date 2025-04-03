@@ -1,11 +1,43 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import profileData from '../content/profile.json';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const { name, about, currently, previously, interests } = profileData;
 ---
+<BaseLayout title={`${name} - About`}>
 
-<Layout>
-	<Welcome />
-</Layout>
+  <h2>about</h2>
+  <p>{about.introduction}</p>
+
+  <h3>I'm currently:</h3>
+  <ul class="profile-list">
+    {currently.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h3>I've previously been a / an:</h3>
+  <ul class="profile-list">
+    {previously.work.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h3>In UofT, I've been a / an:</h3>
+  <ul class="profile-list">
+    {previously.uoft.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <hr />
+
+  <p>{interests.main}</p>
+  <p>{interests.other}</p>
+
+  <h3>Other things I like:</h3>
+  <ul class="profile-list">
+    {interests.likes.map((item) => <li>{item}</li>)}
+  </ul>
+
+  {about.footnote && (
+    <div class="footnote">
+      <p>{about.footnote}</p>
+    </div>
+  )}
+
+</BaseLayout>
