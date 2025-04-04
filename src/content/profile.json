@@ -1,6 +1,6 @@
 {
     "name": "Seongmin Chang",
-    "tagline": "AI Engineer @ Warmblood",
+    "tagline": "AI Engineer @ **Warmblood**",
     "contact": {
       "email": "seongminc@warmblood.kr" 
     },
@@ -16,10 +16,13 @@
     "previously": {
       "work": [
         "AI Research Intern at Yonsei University",
-        "Quant Resarch at Quantlab"
+        "Quant Resarch at Quantlab",
+        ""
       ],
       "uoft": [
-        "Student"
+        "Student",
+        "Lorem ipsum",
+        "Lorem ipsum"
       ]
     },
     "interests": {
