@@ -1,0 +1,26 @@
+---
+/**
+ * Navigation component for blog posts
+ * Used at the top and bottom of each blog post
+ */
+---
+
+<div class="blog-navigation">
+  <a href="/" onclick="sessionStorage.setItem('scrollToSection', 'blog'); return true;" class="back-to-blog">&larr; Back to all posts</a>
+</div>
+
+<style>
+  .blog-navigation {
+    margin: 1.5rem 0;
+  }
+  .back-to-blog {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: #555;
+    text-decoration: none;
+  }
+  .back-to-blog:hover {
+    color: #000;
+    text-decoration: underline;
+  }
+</style>

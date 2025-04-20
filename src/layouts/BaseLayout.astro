@@ -4,9 +4,10 @@ import '../styles/global.css'; // Import global styles
 
 interface Props {
 	title?: string; // Optional title prop
+	isSinglePage?: boolean; // Whether this is a single-page layout
 }
 
-const { title = 'Kok Rui Wong' } = Astro.props; // Default title
+const { title = 'Kok Rui Wong', isSinglePage = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -25,10 +26,20 @@ const { title = 'Kok Rui Wong' } = Astro.props; // Default title
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1m:wght@300&display=swap" rel="stylesheet">
 
 	</head>
-	<body>
+	<body data-single-page={isSinglePage}>
     <Sidebar />
 		<main>
 			<slot /> {/* Page content will be injected here */}
 		</main>
+
+		{/* Import scroll utilities */}
+		<script is:inline>
+			// We need to use the 'is:inline' directive with dynamically imported modules
+			// for client-side scripts in Astro
+			document.addEventListener('DOMContentLoaded', async () => {
+				const scrollUtils = await import('/src/utils/scrollUtils.js');
+				scrollUtils.setupScrollEventListeners();
+			});
+		</script>
 	</body>
 </html>

@@ -1,0 +1,41 @@
+---
+/**
+ * About section component for the homepage
+ */
+import profileData from '../../content/profile.json';
+const { about, currently, previously, interests } = profileData;
+---
+
+<section id="about" class="content-section">
+  <h2>about</h2>
+  <p>{about.introduction}</p>
+
+  <h3>I'm currently:</h3>
+  <ul class="profile-list">
+    {currently.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h3>I've previously been a / an:</h3>
+  <ul class="profile-list">
+    {previously.work.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h3>In UofT, I've been a / an:</h3>
+  <ul class="profile-list">
+    {previously.uoft.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <p>{interests.main}</p>
+  <p>{interests.other}</p>
+
+  <h3>Other things I like:</h3>
+  <ul class="profile-list">
+    {interests.likes.map((item) => <li>{item}</li>)}
+  </ul>
+
+  {about.footnote && (
+    <div class="footnote">
+      <p>{about.footnote}</p>
+    </div>
+  )}
+</section>

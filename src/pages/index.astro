@@ -2,40 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import profileData from '../content/profile.json';
 
-const { name, about, currently, previously, interests } = profileData;
+// Import section components
+import AboutSection from '../components/sections/AboutSection.astro';
+import ProjectsSection from '../components/sections/ProjectsSection.astro';
+import BlogSection from '../components/sections/BlogSection.astro';
+import ContactSection from '../components/sections/ContactSection.astro';
+
+// Get data for page title
+const { name } = profileData;
 ---
-<BaseLayout title={`${name} - About`}>
 
-  <h2>about</h2>
-  <p>{about.introduction}</p>
-
-  <h3>I'm currently:</h3>
-  <ul class="profile-list">
-    {currently.map((item) => <li>{item}</li>)}
-  </ul>
-
-  <h3>I've previously been a / an:</h3>
-  <ul class="profile-list">
-    {previously.work.map((item) => <li>{item}</li>)}
-  </ul>
-
-  <h3>In UofT, I've been a / an:</h3>
-  <ul class="profile-list">
-    {previously.uoft.map((item) => <li>{item}</li>)}
-  </ul>
-
-  <p>{interests.main}</p>
-  <p>{interests.other}</p>
-
-  <h3>Other things I like:</h3>
-  <ul class="profile-list">
-    {interests.likes.map((item) => <li>{item}</li>)}
-  </ul>
-
-  {about.footnote && (
-    <div class="footnote">
-      <p>{about.footnote}</p>
-    </div>
-  )}
-
+<BaseLayout title={`${name} - Personal Website`} isSinglePage={true}>
+  <AboutSection />
+  <ProjectsSection />
+  <BlogSection />
+  <ContactSection />
 </BaseLayout>

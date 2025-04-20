@@ -1,30 +1,5 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import profileData from '../../content/profile.json';
-import { getCollection } from 'astro:content';
-import { format } from 'date-fns'; 
-
-// Fetch and sort blog posts
-const blogEntries = await getCollection('blog');
-const sortedEntries = blogEntries.sort(
-  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
-);
+import RedirectLayout from '../../layouts/redirect/RedirectLayout.astro';
 ---
-<BaseLayout title={`${profileData.name} - Blog`}>
-  <h2>blog</h2>
 
-  <ul class="blog-list">
-    {sortedEntries.map(entry => (
-      <li>
-        <time datetime={entry.data.pubDate.toISOString()}>
-          {format(entry.data.pubDate, 'yyyy-MM-dd')}
-        </time>
-        <a href={`/blog/${entry.slug}/`}>{entry.data.title}</a>
-        {/* Optional: Display description
-        {entry.data.description && <p>{entry.data.description}</p>}
-        */}
-      </li>
-    ))}
-  </ul>
-
-</BaseLayout>
+<RedirectLayout section="blog" displayText="Redirecting to all blog posts..." />

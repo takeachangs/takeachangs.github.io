@@ -1,0 +1,15 @@
+---
+/**
+ * Contact section component for the homepage
+ */
+import profileData from '../../content/profile.json';
+const { contact } = profileData;
+---
+
+<section id="contact" class="content-section">
+  <h2>contact</h2>
+  <p>
+    You can reach me via email at: <a href={`mailto:${contact.email}`}>{contact.email}</a>
+  </p>
+  <!-- Add other contact methods or a form here -->
+</section>

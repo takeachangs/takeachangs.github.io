@@ -3,50 +3,56 @@ import profileData from '../content/profile.json';
 const { name } = profileData;
 const { pathname } = Astro.url; // Get current path
 
-// Helper to check if a link is active (or a parent path is active)
+// Check if we are on the homepage - which is now a single page layout
+const isHomePage = pathname === '/';
+
+// Helper to check if a link is active based on pathname
 const isActive = (linkPath: string) => {
-  if (linkPath === '/') return pathname === '/'; // Exact match for home
-  return pathname.startsWith(linkPath); // Check if current path starts with link path
+  // For homepage (single page), we'll set all to inactive initially
+  // (JS will handle active state as user scrolls)
+  if (isHomePage) {
+    return false;
+  }
+  
+  // For multi-page site, use regular path-based active detection
+  if (linkPath === '/') return pathname === '/';
+  return pathname.startsWith(linkPath);
+}
+
+// Get correct href based on whether we're on homepage (single page) or not
+const getHref = (section: string) => {
+  // On homepage, use hash links for smooth scrolling
+  if (isHomePage) {
+    return `#${section}`;
+  } else {
+    // On other pages, use regular navigation paths
+    return section === 'about' ? '/' : `/${section}`;
+  }
 }
 ---
 <nav class="sidebar">
-  <h1><a href="/">{name}</a></h1>
+  <h1><a href="/" data-home-link>{name}</a></h1>
   <ul>
-    <li><a href="/" class:list={{ active: isActive('/') }}>about</a></li>
-    <li><a href="/projects" class:list={{ active: isActive('/projects') }}>projects</a></li>
-    <li><a href="/blog" class:list={{ active: isActive('/blog') }}>blog</a></li>
-    <li><a href="/contact" class:list={{ active: isActive('/contact') }}>contact</a></li>
+    <li><a href={getHref('about')} class:list={{ active: isActive('/') }}>about</a></li>
+    <li><a href={getHref('projects')} class:list={{ active: isActive('/projects') }}>projects</a></li>
+    <li><a href={getHref('blog')} class:list={{ active: isActive('/blog') }}>blog</a></li>
+    <li><a href={getHref('contact')} class:list={{ active: isActive('/contact') }}>contact</a></li>
   </ul>
 </nav>
 
-<style>
-  h1 {
-    font-size: 1.5rem; /* Adjust size */
-    margin-bottom: 2rem;
-    font-weight: 300;
-  }
-  h1 a {
-    color: inherit; /* Make name link same color as text */
-    text-decoration: none;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  li {
-    margin-bottom: 0.5rem;
-  }
-  a {
-    text-decoration: none;
-    color: #555;
-    display: block; /* Make links easier to click */
-  }
-  a:hover {
-    color: #000;
-    text-decoration: none; /* Keep no underline on hover */
-  }
-  a.active {
-    color: #000; /* Style for active link */
-    font-weight: bold; /* Or other indication */
-  }
-</style>
+{/* Add script to reinitialize scroll detection when clicking site title */}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only add this event listener when not on homepage
+    if (window.location.pathname !== '/') {
+      const homeLink = document.querySelector('[data-home-link]');
+      if (homeLink) {
+        homeLink.addEventListener('click', () => {
+          // This ensures the scroll functionality will be initialized
+          // when clicking the home link from another page
+          sessionStorage.setItem('returnToHome', 'true');
+        });
+      }
+    }
+  });
+</script>

@@ -1,0 +1,35 @@
+---
+/**
+ * Blog section component for the homepage
+ */
+import { getCollection } from 'astro:content';
+
+// Get blog posts data
+const allBlogPosts = await getCollection('blog');
+const sortedPosts = allBlogPosts.sort((a, b) => 
+  new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+);
+---
+
+<section id="blog" class="content-section">
+  <h2>blog</h2>
+  {sortedPosts.length === 0 ? (
+    <p>No blog posts yet. Check back soon!</p>
+  ) : (
+    <ul class="blog-list">
+      {sortedPosts.map((post) => (
+        <li>
+          <time datetime={post.data.pubDate.toISOString()}>
+            {new Date(post.data.pubDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </time>
+          {/* Keep direct links to blog posts */}
+          <a href={`/blog/${post.slug}/`} data-blog-link>{post.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>
