@@ -27,10 +27,12 @@ const { title = 'Kok Rui Wong', isSinglePage = false } = Astro.props;
 
 	</head>
 	<body data-single-page={isSinglePage}>
-    <Sidebar />
-		<main>
-			<slot /> {/* Page content will be injected here */}
-		</main>
+		<div class="container">
+			<Sidebar />
+			<main>
+				<slot /> {/* Page content will be injected here */}
+			</main>
+		</div>
 
 		{/* Import scroll utilities */}
 		<script is:inline>

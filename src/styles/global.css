@@ -24,27 +24,51 @@ html {
 }
 
 body {
-  display: flex;
   min-height: 100vh;
 }
 
 /* ----- Layout Structure ----- */
+
+/* Container to center content */
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  padding: 0 1rem; /* Add padding on small screens */
+}
+
+/* Media queries for responsive layout */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}
 
 /* Sidebar basic styles */
 .sidebar {
   width: 180px; /* Adjust width as needed */
   padding: 2rem 1.5rem;
   border-right: 1px solid #eee; /* Subtle separator */
-  position: fixed; /* Fixed sidebar */
-  height: 100%;
+  position: sticky; /* Now sticky instead of fixed */
+  top: 0;
+  height: 100vh;
   overflow-y: auto; /* Allow scrolling if content exceeds height */
+}
+
+/* Sidebar header with logo and toggle button */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 /* Sidebar specific styles */
 .sidebar h1 {
   font-size: 1.5rem;
-  margin-bottom: 2rem;
   font-weight: 300;
+  margin: 0;
 }
 
 .sidebar h1 a {
@@ -52,9 +76,52 @@ body {
   text-decoration: none;
 }
 
-.sidebar ul {
+/* Mobile toggle button - hidden by default on desktop */
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  outline: none;
+  margin-right: -0.5rem;
+  z-index: 1001;
+}
+
+/* Hamburger icon */
+.hamburger {
+  display: block;
+  position: relative;
+  width: 24px;
+  height: 2px;
+  background: #333;
+  transition: all 0.3s ease;
+}
+
+.hamburger:before,
+.hamburger:after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: #333;
+  left: 0;
+  transition: all 0.3s ease;
+}
+
+.hamburger:before {
+  top: -8px;
+}
+
+.hamburger:after {
+  bottom: -8px;
+}
+
+/* Navigation links */
+.nav-links {
   list-style: none;
   padding: 0;
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .sidebar li {
@@ -65,6 +132,7 @@ body {
   text-decoration: none;
   color: #555;
   display: block; /* Make links easier to click */
+  padding: 0.5rem 0;
 }
 
 .sidebar a:hover {
@@ -77,10 +145,96 @@ body {
   font-weight: bold;
 }
 
+/* Mobile styles */
+@media (max-width: 768px) {
+  .sidebar {
+    height: auto;
+    min-height: auto;
+    position: relative;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+    z-index: 1000;
+  }
+  
+  .mobile-toggle {
+    display: block;
+  }
+  
+  .nav-links {
+    overflow: hidden;
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    transition: all 0.4s ease-out;
+  }
+  
+  /* Nav items animation setup */
+  .nav-links li {
+    opacity: 0;
+    transform: translateY(-15px);
+    transition: all 0.35s cubic-bezier(0.215, 0.61, 0.355, 1);
+    margin-bottom: 0;
+  }
+  
+  /* Show navigation when nav-open class is added */
+  .sidebar.nav-open .nav-links {
+    display: block;
+    max-height: 300px;
+    margin-top: 1rem;
+    opacity: 1;
+  }
+  
+  /* Staggered animation for nav items */
+  .sidebar.nav-open .nav-links li {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .sidebar.nav-open .nav-links li:nth-child(1) {
+    transition-delay: 0.1s;
+  }
+  
+  .sidebar.nav-open .nav-links li:nth-child(2) {
+    transition-delay: 0.2s;
+  }
+  
+  .sidebar.nav-open .nav-links li:nth-child(3) {
+    transition-delay: 0.3s;
+  }
+  
+  .sidebar.nav-open .nav-links li:nth-child(4) {
+    transition-delay: 0.4s;
+  }
+  
+  /* Animate hamburger to X when opened */
+  .sidebar.nav-open .hamburger {
+    background: transparent;
+  }
+  
+  .sidebar.nav-open .hamburger:before {
+    transform: rotate(45deg);
+    top: 0;
+  }
+  
+  .sidebar.nav-open .hamburger:after {
+    transform: rotate(-45deg);
+    bottom: 0;
+  }
+  
+  /* Improve mobile navigation item styling */
+  .sidebar a {
+    padding: 0.75rem 0;
+    font-size: 1.1rem;
+  }
+}
+
 /* Main content area */
 main {
   flex-grow: 1;
-  padding: 2rem 2rem 2rem calc(180px + 2rem); /* Left padding = sidebar width + desired gap */
+  padding: 2rem;
   max-width: 800px; /* Optional: Limit content width */
 }
 
@@ -112,6 +266,15 @@ section.content-section {
 section.content-section:not(:last-child) {
   border-bottom: 1px solid #eee;
   margin-bottom: 2rem;
+}
+
+/* Media queries for content sections on mobile */
+@media (max-width: 768px) {
+  section.content-section {
+    min-height: auto; /* Don't force full height on mobile */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
 }
 
 

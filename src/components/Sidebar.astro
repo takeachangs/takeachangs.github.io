@@ -31,8 +31,14 @@ const getHref = (section: string) => {
 }
 ---
 <nav class="sidebar">
-  <h1><a href="/" data-home-link>{name}</a></h1>
-  <ul>
+  <div class="sidebar-header">
+    <h1><a href="/" data-home-link>{name}</a></h1>
+    <button class="mobile-toggle" aria-label="Toggle navigation">
+      <span class="hamburger"></span>
+    </button>
+  </div>
+  
+  <ul class="nav-links">
     <li><a href={getHref('about')} class:list={{ active: isActive('/') }}>about</a></li>
     <li><a href={getHref('projects')} class:list={{ active: isActive('/projects') }}>projects</a></li>
     <li><a href={getHref('blog')} class:list={{ active: isActive('/blog') }}>blog</a></li>
@@ -40,10 +46,29 @@ const getHref = (section: string) => {
   </ul>
 </nav>
 
-{/* Add script to reinitialize scroll detection when clicking site title */}
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Only add this event listener when not on homepage
+    // Mobile menu toggle functionality
+    const mobileToggle = document.querySelector('.mobile-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (mobileToggle) {
+      mobileToggle.addEventListener('click', () => {
+        sidebar?.classList.toggle('nav-open');
+      });
+      
+      // Close menu when clicking on a link (on mobile)
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            sidebar?.classList.remove('nav-open');
+          }
+        });
+      });
+    }
+    
+    // Reinitialize scroll detection when clicking site title
     if (window.location.pathname !== '/') {
       const homeLink = document.querySelector('[data-home-link]');
       if (homeLink) {
