@@ -1,0 +1,44 @@
+---
+layout: default
+---
+
+<main class="global-wrapper">
+  <div class="main-columns">
+    <!-- 7.5% Column: Empty space -->
+    <div class="header-column">
+      <!-- Empty column for spacing -->
+    </div>
+
+    <!-- 92.5% Column: Content -->
+    <div class="content-column">
+      <div class="content-wrapper">
+        <!-- Navigation -->
+        <nav class="main-nav" style="margin-bottom: calc(var(--base-spacing) * 2);">
+          <a href="/">Home</a>
+          <a href="/about.html">About</a>
+          <a href="/experience.html">Experience</a>
+          <a href="/projects.html">Projects</a>
+        </nav>
+
+        <!-- Post Content -->
+        <article class="blog-post">
+          <header>
+            <h1 class="post-title">{{ page.title }}</h1>
+            <div class="post-meta">
+              {% if page.image %}
+              <div class="post-image-container">
+                <img class="post-image" src="{{ page.image }}" alt="{{ page.alt }}">
+              </div>
+              {% endif %}
+              <p class="post-date">{{ page.date | date: "%b %d—%Y" }}</p>
+            </div>
+          </header>
+
+          <div class="post-content" style="max-width: 680px; margin-top: calc(var(--base-spacing) * 2);">
+            {{ content }}
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</main>
