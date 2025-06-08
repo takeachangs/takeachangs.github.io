@@ -74,6 +74,7 @@ body {
   height: 22px;
   object-fit: contain;
   display: block;
+  border-radius: 4px;
 }
 
 /* --- 92.5% Content Column --- */
