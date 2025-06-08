@@ -2,8 +2,8 @@
 layout: post
 title: "How Owning Less Feels Like Living More"
 date: 2025-03-18
-image: "https://images.unsplash.com/photo-1543286793-64949b01df32?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=600"
-alt: "A minimalist green desk lamp."
+image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop&crop=entropy&auto=format&q=80"
+alt: "A minimalist desk lamp in a clean workspace."
 ---
 
 There's a paradox at the heart of minimalism: the less you own, the more you seem to have.

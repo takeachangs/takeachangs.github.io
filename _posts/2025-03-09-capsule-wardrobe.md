@@ -2,8 +2,8 @@
 layout: post
 title: "How a Capsule Wardrobe Simplifies Life"
 date: 2025-03-09
-image: "https://images.unsplash.com/photo-1506929562872-bb421503c74e?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=600"
-alt: "Minimalist wooden clothing rack with a few items."
+image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop&crop=entropy&auto=format&q=80"
+alt: "Minimalist wooden clothing rack with organized garments."
 ---
 
 A capsule wardrobe isn't about having fewer clothes—it's about having the right clothes.

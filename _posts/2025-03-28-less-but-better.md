@@ -2,7 +2,7 @@
 layout: post
 title: "Less but Better: Why Minimalism is a Mindset, Not Just an Aesthetic"
 date: 2025-03-28
-image: "https://images.unsplash.com/photo-1529946179351-ead3c3a434d3?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=600"
+image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=400&fit=crop&crop=entropy&auto=format&q=80"
 alt: "A person stands in a minimal landscape with their arm raised."
 ---
 
