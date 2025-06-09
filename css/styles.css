@@ -572,8 +572,7 @@ body {
 .social-sidebar {
   position: fixed;
   left: calc(var(--base-spacing) * 1.5);
-  top: 50%;
-  transform: translateY(-50%);
+  top: calc(var(--base-spacing) * 3.5);
   z-index: 10;
 }
 
