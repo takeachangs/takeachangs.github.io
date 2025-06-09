@@ -641,32 +641,41 @@ body {
   }
 
   .social-sidebar {
-    position: static;
-    left: auto;
-    top: auto;
+    position: fixed;
+    left: calc(var(--base-spacing) * 0.5);
+    top: calc(var(--base-spacing) * 0.5);
     transform: none;
-    text-align: center;
-    margin: calc(var(--base-spacing) * 2) 0;
+    text-align: left;
+    margin: 0;
   }
 
   .social-links {
-    flex-direction: row;
-    justify-content: center;
-    gap: var(--base-spacing);
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--base-spacing) * 0.5);
   }
 
   .logo {
-    margin-bottom: 0;
-    margin-right: var(--base-spacing);
-    padding-bottom: 0;
-    border-bottom: none;
-    border-right: 1px solid rgba(0, 153, 77, 0.2);
-    padding-right: var(--base-spacing);
+    margin-bottom: calc(var(--base-spacing) * 0.5);
+    padding-bottom: calc(var(--base-spacing) * 0.25);
+    border-bottom: 1px solid rgba(0, 153, 77, 0.2);
+    margin-right: 0;
+    padding-right: 0;
+    border-right: none;
+  }
+
+  .logo-image {
+    width: 16px;
+    height: 16px;
+  }
+
+  .social-links svg {
+    width: 16px;
+    height: 16px;
   }
 
   .social-links a {
-    margin-bottom: 0;
+    margin-bottom: calc(var(--base-spacing) * 0.5);
   }
 
   .hero-text {
