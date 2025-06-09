@@ -572,7 +572,8 @@ body {
 .social-sidebar {
   position: fixed;
   left: calc(var(--base-spacing) * 1.5);
-  top: calc(var(--base-spacing) * 3.5);
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 10;
 }
 
@@ -666,13 +667,13 @@ body {
   }
 
   .logo-image {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
   }
 
   .social-links svg {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
   }
 
   .social-links a {
