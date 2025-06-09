@@ -603,6 +603,7 @@ body {
   .main-columns {
     flex-direction: column;
     padding: 0 var(--base-spacing);
+    padding-left: calc(var(--base-spacing) * 3);
   }
 
   .header-column {
@@ -665,13 +666,13 @@ body {
   }
 
   .logo-image {
-    width: 16px;
-    height: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   .social-links svg {
-    width: 16px;
-    height: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   .social-links a {
