@@ -1,0 +1,33 @@
+# Project listings consumed by projects.html
+- title: "Minimalist Portfolio Website"
+  url: "#"
+  image: assets/project1.png
+  alt: "Minimalist Portfolio Website"
+  year: "2024"
+  tech: "HTML, CSS, JavaScript"
+  description: >-
+    A clean, minimalist portfolio website built with pure HTML and CSS.
+- title: "AI Content Generator"
+  url: "#"
+  image: assets/project2.png
+  alt: "AI Content Generator"
+  year: "2024"
+  tech: "Python, TensorFlow, Flask"
+  description: >-
+    Machine learning application that generates human-like content using NLP.
+- title: "Data Visualization Dashboard"
+  url: "#"
+  image: assets/project3.png
+  alt: "Data Visualization Dashboard"
+  year: "2023"
+  tech: "React, D3.js, Node.js"
+  description: >-
+    Interactive dashboard for visualizing complex datasets with real-time updates.
+- title: "Mobile App Design System"
+  url: "#"
+  image: assets/project4.png
+  alt: "Mobile App Design System"
+  year: "2023"
+  tech: "Figma, Design Tokens, Documentation"
+  description: >-
+    Comprehensive design system with component library and design tokens.

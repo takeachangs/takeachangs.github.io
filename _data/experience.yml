@@ -1,0 +1,38 @@
+# Experience content consumed by experience.html
+work:
+  - role: "AI Engineer"
+    company: "Warmblood Co., Ltd."
+    duration: "2025 Apr — Present"
+    location: "Seoul, South Korea"
+    description: >-
+      Developing AI solutions and machine learning systems. Focus on building scalable AI infrastructure and
+      implementing cutting-edge algorithms for real-world applications.
+  - role: "AI Research Intern"
+    company: "Human AI Research Lab, Yonsei University"
+    duration: "2024 Sep — 2025 Mar"
+    location: "Seoul, South Korea"
+    description: >-
+      Built the lab's first <a href="https://hair-lab.vercel.app/">website</a>. Conducting computational linguistic
+      modeling research funded by National Research Foundation of Korea under Professor Keeheon Lee. Developed custom
+      multi-agent framework for decentralized meta research with autonomous collaboration capabilities.
+education:
+  - role: "HBSc Mathematics"
+    company: "University of Toronto"
+    duration: "Year — Year"
+    location: "Toronto, ON"
+    description: >-
+      Software Design, Databases, Theory of Computations, Probability and Statistics, Mathematical Modelling, ODE,
+      Multivariable Calculus, Graph Theory, Combinatorics, Micro/Macroeconomics.
+skills:
+  - category: "Technical"
+    items:
+      - "Machine Learning"
+      - "Python"
+      - "AI Development"
+      - "Data Science"
+  - category: "Design"
+    items:
+      - "UI/UX Design"
+      - "Minimalist Design"
+      - "Typography"
+      - "Web Design"

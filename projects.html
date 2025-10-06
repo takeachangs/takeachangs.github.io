@@ -20,77 +20,37 @@ title: Projects
           <div class="content-left"></div>
           <div class="content-right">
             <div class="projects-content">
+              {% assign projects = site.data.projects | default: [] %}
+              {% comment %}Project entries defined in _data/projects.yml{% endcomment %}
+              {% for project in projects %}
               <div class="project-entry">
                 <h2 class="project-title">
-                  <a href="#" class="project-title-link">Minimalist Portfolio Website</a>
+                  {% if project.url %}
+                  <a href="{{ project.url }}" class="project-title-link">{{ project.title }}</a>
+                  {% else %}
+                  {{ project.title }}
+                  {% endif %}
                 </h2>
                 <div class="project-meta">
+                  {% if project.image %}
                   <div class="project-image-container">
-                    <img src="assets/project1.png" alt="Minimalist Portfolio Website" class="project-image">
+                    <img src="{{ project.image }}" alt="{{ project.alt | default: project.title }}" class="project-image">
                   </div>
+                  {% endif %}
                   <div class="project-details">
-                    <span class="project-year">2024</span>
-                    <span class="project-tech">HTML, CSS, JavaScript</span>
-                    <p class="project-description">
-                      A clean, minimalist portfolio website built with pure HTML and CSS.
-                    </p>
+                    {% if project.year %}
+                    <span class="project-year">{{ project.year }}</span>
+                    {% endif %}
+                    {% if project.tech %}
+                    <span class="project-tech">{{ project.tech }}</span>
+                    {% endif %}
+                    {% if project.description %}
+                    <p class="project-description">{{ project.description }}</p>
+                    {% endif %}
                   </div>
                 </div>
               </div>
-
-              <div class="project-entry">
-                <h2 class="project-title">
-                  <a href="#" class="project-title-link">AI Content Generator</a>
-                </h2>
-                <div class="project-meta">
-                  <div class="project-image-container">
-                    <img src="assets/project2.png" alt="AI Content Generator" class="project-image">
-                  </div>
-                  <div class="project-details">
-                    <span class="project-year">2024</span>
-                    <span class="project-tech">Python, TensorFlow, Flask</span>
-                    <p class="project-description">
-                      Machine learning application that generates human-like content using NLP.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="project-entry">
-                <h2 class="project-title">
-                  <a href="#" class="project-title-link">Data Visualization Dashboard</a>
-                </h2>
-                <div class="project-meta">
-                  <div class="project-image-container">
-                    <img src="assets/project3.png" alt="Data Visualization Dashboard" class="project-image">
-                  </div>
-                  <div class="project-details">
-                    <span class="project-year">2023</span>
-                    <span class="project-tech">React, D3.js, Node.js</span>
-                    <p class="project-description">
-                      Interactive dashboard for visualizing complex datasets with real-time updates.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="project-entry">
-                <h2 class="project-title">
-                  <a href="#" class="project-title-link">Mobile App Design System</a>
-                </h2>
-                <div class="project-meta">
-                  <div class="project-image-container">
-                    <img src="assets/project4.png" alt="Mobile App Design System" class="project-image">
-                  </div>
-                  <div class="project-details">
-                    <span class="project-year">2023</span>
-                    <span class="project-tech">Figma, Design Tokens, Documentation</span>
-                    <p class="project-description">
-                      Comprehensive design system with component library and design tokens.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
