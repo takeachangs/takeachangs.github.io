@@ -1,0 +1,10 @@
+{% assign nav_items = site.data.page_nav | default: [] %}
+<nav class="{{ include.nav_class | default: 'main-nav' }}">
+  {% for item in nav_items %}
+    {% assign link_classes = '' %}
+    {% if item.url == page.url %}
+      {% assign link_classes = 'current-page' %}
+    {% endif %}
+    <a href="{{ item.url }}"{% if link_classes != '' %} class="{{ link_classes }}"{% endif %}>{{ item.label }}</a>
+  {% endfor %}
+</nav>
