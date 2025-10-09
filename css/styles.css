@@ -343,12 +343,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: url(#duotone-green);
-  transition: filter 0.3s ease;
-}
-
-.project-image:hover {
-  filter: url(#duotone-green-alt);
 }
 
 .project-details {
@@ -554,12 +548,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: url(#duotone-green);
-  transition: filter 0.3s ease;
-}
-
-.post-image:hover {
-  filter: url(#duotone-green-alt);
 }
 
 .post-date {
