@@ -38,6 +38,7 @@ The design was matched to emilkowal.ski numerically (bounding-rect comparisons a
 - Never gate a CSS transition's start state on `requestAnimationFrame` — background tabs freeze rAF and the transition never fires. Force a synchronous reflow instead (`void el.offsetHeight`) before applying the target state; `script.js` and `widgets.js` already follow this pattern.
 - A new demo widget needs both a custom element in `widgets.js` and its CSS in `styles.css`; reuse the shared `.demo` / `.demo-stage` / `.demo-caption` card chrome.
 - The newsletter form has no backend; the hook point is marked with a `ponytail:` comment in `script.js`.
+- `favicon.png`/`favicon.ico`/`apple-touch-icon.png` are generated, hand-maintained binary assets (not part of the content→build pipeline) — circularly masked from `seongmin_logo.png` via a one-off Pillow script (`uv run --with pillow`, not a project dependency). Regenerate by re-running that crop/mask/export if the source art changes; the favicon PNG/ICO are transparent outside the circle, `apple-touch-icon.png` intentionally keeps its square white background since iOS applies its own mask and fills transparent pixels black otherwise.
 
 ## Still placeholder
 
