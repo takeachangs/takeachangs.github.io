@@ -11,6 +11,7 @@ A dependency-free static portfolio site whose design recreates https://emilkowal
 - `npm run build` (= `node build.js`) — regenerates `index.html` and `blog/<slug>/index.html` from `content/`. Success prints `built index.html + N posts`. Run after any change to `content/` or the templates in `build.js`.
 - Serve: `python3 server.py` from the repo root (http.server on port 4173 plus `Cache-Control: no-cache` — plain `python3 -m http.server` heuristically caches edited CSS/JS and will show stale styles). The browser-preview launch config `portfolio` (`.claude/launch.json`) runs it. Generated pages use root-relative asset paths, so serving from the repo root is required.
 - No tests, no linter.
+- Deploy: `git push origin main` — this repo *is* `takeachangs/takeachangs.github.io`, live at https://seongm.in/ via GitHub Pages. Run `npm run build` and commit the regenerated output before pushing; Pages serves whatever's committed, it doesn't run the build. `CNAME` (custom domain) and `.nojekyll` (tells Pages to serve the pre-built HTML as-is, skip Jekyll) must stay at the repo root — don't delete them. The old Jekyll site's full history lives on the `backup-pre-portfolio2` branch.
 
 ## Architecture: content → build → generated output
 
