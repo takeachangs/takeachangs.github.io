@@ -523,7 +523,9 @@ svg {
 demo-transition,
 demo-speed,
 demo-toast,
-demo-morph {
+demo-morph,
+demo-scalein,
+demo-loop {
   display: block;
 }
 
@@ -778,6 +780,212 @@ demo-morph {
   transition: none;
 }
 
+.scalein {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.scalein-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 220px; /* stat text swaps must never move layout */
+}
+
+.scalein-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scalein-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--label);
+}
+
+.scalein-stat {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray-1000);
+}
+
+.scalein-sessions {
+  display: flex;
+  gap: 6px;
+}
+
+.scalein-hosts {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.scalein-host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-radius: 8px;
+  background-color: var(--gray-300);
+  border: 1px dashed transparent;
+  padding: 6px;
+  transition: background-color 260ms ease, border-color 260ms ease;
+}
+
+/* terminated host = reclaimed capacity: fill fades, dashed outline stays in place */
+.scalein-host.scalein-reclaimed {
+  background-color: transparent;
+  border-color: var(--gray-800);
+}
+
+.scalein-host-label {
+  font-size: 10px;
+  color: var(--gray-1000);
+  transition: opacity 260ms ease;
+}
+
+.scalein-reclaimed .scalein-host-label {
+  opacity: 0.5;
+}
+
+.scalein-host-sessions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 50px;
+}
+
+.scalein-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-1200);
+  background: var(--gray-100);
+  transform-origin: center;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scalein-box.scalein-exit {
+  transform: scale(0.9) translateY(3px);
+  opacity: 0;
+  transition: transform 200ms cubic-bezier(0.4, 0, 1, 1), opacity 200ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.scalein-btn {
+  width: 136px;
+  transition: transform 160ms ease-out, width 300ms cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+.scalein-btn:active {
+  transform: scale(0.97);
+}
+
+.scalein-btn span {
+  display: block;
+  white-space: nowrap;
+  transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1), transform 150ms cubic-bezier(0.23, 1, 0.32, 1), filter 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.scalein-btn span.morph-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(2px);
+}
+
+.scalein-btn span.morph-in {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(2px);
+  transition: none;
+}
+
+.loop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loop-state {
+  font-family: Mono, ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+
+.loop-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 304px;
+}
+
+.loop-rule {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: Mono, ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gray-1000);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.loop-rule span {
+  white-space: nowrap;
+}
+
+.loop-rule.loop-scan {
+  background-color: var(--gray-200);
+}
+
+.loop-rule.loop-fired {
+  background-color: var(--gray-200);
+  color: var(--label);
+}
+
+.loop-saw {
+  font-size: 12px;
+  color: var(--gray-1000);
+  font-variant-numeric: tabular-nums;
+}
+
+.loop-state span,
+.loop-saw span {
+  display: block;
+  white-space: nowrap;
+  transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1), transform 150ms cubic-bezier(0.23, 1, 0.32, 1), filter 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.loop-state span.morph-out,
+.loop-saw span.morph-out {
+  opacity: 0;
+  transform: translateY(-8px);
+  filter: blur(2px);
+}
+
+.loop-state span.morph-in,
+.loop-saw span.morph-in {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: none;
+}
+
+.loop-btn {
+  transition: transform 160ms ease-out;
+}
+
+.loop-btn:active {
+  transform: scale(0.97);
+}
+
 @media (prefers-color-scheme: dark) {
   .pill-white,
   .demo-menu,
@@ -808,6 +1016,42 @@ demo-morph {
   .morph-button span,
   .pill-dark.eased {
     transition: none;
+  }
+
+  .scalein-box {
+    transition: opacity 120ms ease;
+  }
+
+  .scalein-box.scalein-exit {
+    transition: opacity 120ms ease;
+    transform: none;
+  }
+
+  .scalein-btn {
+    transition: none;
+  }
+
+  .scalein-btn span,
+  .scalein-btn span.morph-out,
+  .scalein-btn span.morph-in {
+    transform: none;
+    filter: none;
+    transition: opacity 100ms ease;
+  }
+
+  .loop-rule {
+    transition: none;
+  }
+
+  .loop-state span,
+  .loop-saw span,
+  .loop-state span.morph-out,
+  .loop-saw span.morph-out,
+  .loop-state span.morph-in,
+  .loop-saw span.morph-in {
+    transform: none;
+    filter: none;
+    transition: opacity 100ms ease;
   }
 }
 
