@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shipping Small Things</title>
+    <meta name="description" content="Why tiny projects teach more than big ones." />
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout-root">
+      <header class="site-header">
+        <a class="site-name" href="/">Seongmin Chang</a>
+        <span class="site-role">AI Engineer</span>
+      </header>
+
+      <main>
+        <div class="article">
+<p>Every big thing I&#39;ve learned came from shipping something small. Not a product — a piece. A toast. A menu. A button that morphs. Small things are honest: there is nowhere for sloppy details to hide, and you can hold the entire problem in your head at once.</p>
+<a class="h-anchor" href="#the-toast-that-taught-me-stacking"><h2 id="the-toast-that-taught-me-stacking">The toast that taught me stacking</h2></a>
+<p>A toast component looks trivial from a distance. Then you build one and meet the real questions: what happens when three arrive at once? Do older ones shrink, slide, or fade? Should the stack collapse on hover? Every answer is a design decision wearing an engineering costume.</p>
+<demo-toast caption="Press the button a few times to see the stack behave."></demo-toast>
+<p>Notice what the stack is doing: each older toast steps back <code>14px</code> and scales down slightly, so depth reads at a glance without stealing attention from the newest message.</p>
+<a class="h-anchor" href="#small-scope-full-quality"><h2 id="small-scope-full-quality">Small scope, full quality</h2></a>
+<p>The trick is treating a small thing with full seriousness:</p>
+<ul>
+<li>Handle the empty, single, and overflowing cases.</li>
+<li>Make it feel right with the keyboard, not just the pointer.</li>
+<li>Respect <code>prefers-reduced-motion</code> from day one.</li>
+</ul>
+<p>None of this is glamorous. All of it transfers. When a bigger project shows up, you don&#39;t rise to the occasion — you fall back on the habits you built on the small stuff.</p>
+<p>Ship the toast. The product can come later.</p>
+
+        </div>
+      </main>
+    </div>
+
+    <script src="/script.js"></script>
+    <script src="/widgets.js" defer></script>
+  </body>
+</html>

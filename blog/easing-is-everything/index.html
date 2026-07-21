@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Easing Is Everything</title>
+    <meta name="description" content="How timing curves change the way motion feels." />
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout-root">
+      <header class="site-header">
+        <a class="site-name" href="/">Seongmin Chang</a>
+        <span class="site-role">AI Engineer</span>
+      </header>
+
+      <main>
+        <div class="article">
+<p>Two animations with the same duration can feel completely different. Duration decides how long something takes; the easing curve decides what it <em>feels</em> like on the way. Most motion that reads as &quot;cheap&quot; isn&#39;t too slow or too fast — it&#39;s linear.</p>
+<p>Nothing in the physical world moves linearly. Things accelerate, coast, and settle. When an element glides at constant speed, our eyes flag it as synthetic immediately.</p>
+<a class="h-anchor" href="#start-with-ease-out"><h2 id="start-with-ease-out">Start with ease-out</h2></a>
+<p>For elements entering the screen, you almost always want an <code>ease-out</code> curve — fast at the start, settling at the end. The interface responds instantly, then calms down:</p>
+<div class="code-block"><pre><code><span class="line">.menu {</span>
+<span class="line">  <span class="tok-attr">transform-origin</span>: top;</span>
+<span class="line">  <span class="tok-attr">transition</span>: transform <span class="tok-num">180ms</span> <span class="tok-fn">cubic-bezier</span>(<span class="tok-num">0.16</span>, <span class="tok-num">1</span>, <span class="tok-num">0.3</span>, <span class="tok-num">1</span>),</span>
+<span class="line">    opacity <span class="tok-num">180ms</span> ease-out;</span>
+<span class="line">}</span>
+<span class="line"> </span>
+<span class="line">.menu[data-closed] {</span>
+<span class="line">  <span class="tok-attr">transform</span>: <span class="tok-fn">scaleY</span>(<span class="tok-num">0.95</span>);</span>
+<span class="line">  <span class="tok-attr">opacity</span>: <span class="tok-num">0</span>;</span>
+<span class="line">}</span></code></pre></div>
+<p>The curve <code>cubic-bezier(0.16, 1, 0.3, 1)</code> overshoots nothing but decelerates hard, which makes a <code>180ms</code> animation feel even faster than it is.</p>
+<a class="h-anchor" href="#state-changes-want-symmetry-broken"><h2 id="state-changes-want-symmetry-broken">State changes want symmetry broken</h2></a>
+<p>A common mistake is using one curve everywhere. Enter and exit have different jobs: an entrance should announce itself, an exit should disappear before you think about it. In practice that means exits get shorter durations and simpler curves:</p>
+<div class="code-block"><pre><code><span class="line"><span class="tok-kw">function</span> <span class="tok-fn">toggle</span>(menu, open) {</span>
+<span class="line">  menu.style.transition = open</span>
+<span class="line">    ? <span class="tok-str">"transform 180ms cubic-bezier(0.16, 1, 0.3, 1)"</span></span>
+<span class="line">    : <span class="tok-str">"transform 120ms ease-in"</span>;</span>
+<span class="line">  menu.dataset.state = open ? <span class="tok-str">"open"</span> : <span class="tok-str">"closed"</span>;</span>
+<span class="line">}</span></code></pre></div>
+<a class="h-anchor" href="#feel-it-don-39-t-read-it"><h2 id="feel-it-don-39-t-read-it">Feel it, don&#39;t read it</h2></a>
+<p>Curves are impossible to evaluate in a table of numbers. Put the interaction in your hand and press it a few dozen times — a morphing control makes the character of a curve obvious in a way no cheatsheet can.</p>
+<demo-morph caption="Press the button to feel a spring-flavored curve."></demo-morph>
+<p>When a transition finally feels right, write the values down. A small set of named curves you actually trust beats a folder of bookmarked easing galleries.</p>
+
+        </div>
+      </main>
+    </div>
+
+    <script src="/script.js"></script>
+    <script src="/widgets.js" defer></script>
+  </body>
+</html>

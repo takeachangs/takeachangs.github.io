@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Designing With Restraint</title>
+    <meta name="description" content="Why less motion often feels like more." />
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout-root">
+      <header class="site-header">
+        <a class="site-name" href="/">Seongmin Chang</a>
+        <span class="site-role">AI Engineer</span>
+      </header>
+
+      <main>
+        <div class="article">
+<p>Motion is the easiest tool to overuse. A little of it makes an interface feel alive; too much of it makes every click feel like waiting. The difference between the two is rarely the animation itself — it&#39;s whether the animation has a job.</p>
+<p>Before adding one, I try to answer a single question: <em>what</em> does this movement explain? If the answer is &quot;nothing, it just looks nice&quot;, that is sometimes fine. But it should be a deliberate choice, not a default.</p>
+<a class="h-anchor" href="#give-motion-a-job"><h2 id="give-motion-a-job">Give motion a job</h2></a>
+<p>Good animation carries information. It can show where something came from, where it went, or that the interface heard you. When a hover state eases instead of snapping, the button feels calmer under the cursor — the change reads as a surface reacting, not a pixel flipping.</p>
+<demo-transition caption="Hover over the buttons. The left one snaps, the right one eases."></demo-transition>
+<p>The effect is subtle, and that&#39;s the point. You would never call the eased button &quot;animated&quot;. You would just say it feels better, without being able to name why.</p>
+<a class="h-anchor" href="#respect-frequency"><h2 id="respect-frequency">Respect frequency</h2></a>
+<p>How often an interaction happens should set how much motion it gets:</p>
+<ul>
+<li>A dialog you see once a day can afford a soft entrance.</li>
+<li>A menu you open hundreds of times should get out of your way.</li>
+<li>Anything on a keyboard path should feel instant.</li>
+</ul>
+<p>The same dropdown at two speeds makes the trade-off obvious. The slower one is more <em>dramatic</em>, but drama is exactly what you don&#39;t want on the hundredth open.</p>
+<demo-speed caption="Click the buttons to compare. 180ms on the left, 400ms on the right."></demo-speed>
+<p>Past <code>300ms</code>, a UI animation stops feeling responsive and starts feeling like a decision you made on the user&#39;s behalf.</p>
+<a class="h-anchor" href="#restraint-is-a-feature"><h2 id="restraint-is-a-feature">Restraint is a feature</h2></a>
+<p>Removing an animation is a design decision with the same weight as adding one. The interfaces I admire most animate rarely — and because they animate rarely, the moments they do move actually mean something.</p>
+<p>Less motion, chosen carefully, reads as confidence.</p>
+<p><a class="arrow-link" href="/blog/">See everything I&#39;ve written<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h13M13 6.5 18.5 12 13 17.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg></a></p>
+
+        </div>
+      </main>
+    </div>
+
+    <script src="/script.js"></script>
+    <script src="/widgets.js" defer></script>
+  </body>
+</html>
