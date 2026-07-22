@@ -4,7 +4,7 @@
   "description": "AI Engineer",
   "blogLimit": 5,
   "today": [
-    "I'm the founding AI engineer at <a href=\"https://warmblood.kr/\" target=\"_blank\">Warmblood</a>, building <a href=\"https://monocle-ai.com/\" target=\"_blank\">Monocle AI</a> and <a href=\"https://safetysnap.ai/\" target=\"_blank\">SafetySnap</a>. My work lives in the edges — the connections nobody thought to draw.",
+    "I'm a Forward Deployed AI Engineer at <a href=\"https://warmblood.kr/\" target=\"_blank\">Warmblood</a>, building <a href=\"https://monocle-ai.com/\" target=\"_blank\">Monocle AI</a> and <a href=\"https://safetysnap.ai/\" target=\"_blank\">SafetySnap</a>. My work lives in the edges — the connections nobody thought to draw.",
     "Previously, I worked at Yonsei University as an AI researcher. I've learnt to build LLM from scratch here.",
     "While our products serve thousands of users in Korea with the latest technology, I'm studying <a href=\"https://artsci.calendar.utoronto.ca/program/asspe1890\" target=\"_blank\">applied maths</a> at the University of Toronto to stay grounded in the fundamentals underneath it all.",
     "You can reach me via <a href=\"https://www.linkedin.com/in/seongminc/\" target=\"_blank\">LinkedIn</a> or <a href=\"mailto:seongminc0119@gmail.com\">email</a>."
@@ -32,8 +32,8 @@
     }
   ],
   "newsletter": {
-    "description": "Occasional notes on design and code. A few times a year, no noise.",
+    "description": "Occasional notes on what I find interesting. A few times a year, no noise.",
     "button": "Subscribe"
   },
-  "more": "You can see more of my interests on <a href=\"https://x.com\" target=\"_blank\">X</a> and more of my code on <a href=\"https://github.com\" target=\"_blank\">GitHub</a>."
+  "more": "You can see more of my interests on <a href=\"https://x.com/psmc0119\" target=\"_blank\">X</a> and more of my code on <a href=\"https://github.com/takeachangs\" target=\"_blank\">GitHub</a>."
 }
