@@ -525,7 +525,8 @@ demo-speed,
 demo-toast,
 demo-morph,
 demo-scalein,
-demo-loop {
+demo-loop,
+demo-minote-bar {
   display: block;
 }
 
@@ -1068,5 +1069,258 @@ demo-loop {
 
   .newsletter button:active {
     transform: none;
+  }
+}
+
+/* ---------- demo-minote-bar (Minote's bottom bar) ---------- */
+
+.mbar {
+  position: relative;
+  width: 100%;
+  max-width: 402px;
+  height: 100%;
+}
+
+/* the two bar members. In the app both sit on Liquid Glass; on a flat card
+   the fill alone carries the material. Every animated property is explicitly
+   paired with its curve — a transition-property override cycles the shorter
+   duration list and desyncs the axes. morphSpring: 0.4s, slight overshoot. */
+.mbar-pill,
+.mbar-circle {
+  position: absolute;
+  bottom: 0;
+  height: 50px;
+  border-radius: 25px;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--gray-300);
+}
+
+/* resting insets: 34pt edges, 12pt gap, 50pt circle */
+.mbar-pill {
+  left: 34px;
+  right: 96px;
+  transition: left 400ms cubic-bezier(0.3, 1.18, 0.45, 1),
+    right 400ms cubic-bezier(0.3, 1.18, 0.45, 1),
+    opacity 250ms ease;
+}
+
+.mbar-circle {
+  right: 34px;
+  width: 50px;
+  transition: right 400ms cubic-bezier(0.3, 1.18, 0.45, 1),
+    width 400ms cubic-bezier(0.3, 1.18, 0.45, 1),
+    height 400ms cubic-bezier(0.3, 1.18, 0.45, 1),
+    transform 160ms ease-out;
+}
+
+/* press feedback while it's still a button — in compose mode it IS the
+   composer, no longer pressable. The pill never scales: the melt is its
+   feedback, same as the app. */
+.mbar:not(.m-compose) .mbar-circle:active {
+  transform: scale(0.97);
+}
+
+/* searching: both widen toward the keyboard's edges */
+.mbar.m-search .mbar-pill {
+  left: 12px;
+  right: 74px;
+}
+
+.mbar.m-search .mbar-circle {
+  right: 12px;
+}
+
+/* composing: the circle stretches into the two-row composer; the pill melts */
+.mbar.m-compose .mbar-pill {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mbar.m-compose .mbar-circle {
+  right: 12px;
+  width: calc(100% - 24px);
+  height: 90px;
+  cursor: text;
+}
+
+.mbar-pill-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 14px;
+  font-size: 17px;
+  line-height: 21px;
+  color: var(--gray-1000);
+}
+
+.mbar-pill-inner svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+/* caret = the text's own 21px line box, so it sits flush with the glyph line */
+.mbar-cursor {
+  display: none;
+  width: 2px;
+  height: 21px;
+  background: #007aff;
+  border-radius: 1px;
+  animation: mbar-blink 1.1s steps(1) infinite;
+  flex: none;
+}
+
+.mbar.m-search .mbar-cursor {
+  display: inline-block;
+}
+
+@keyframes mbar-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* circle faces: pencil ⇄ ✕ crossfade (opacity + scale + blur) */
+.mbar-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-1000);
+  opacity: 0;
+  transform: scale(0.85);
+  filter: blur(3px);
+  transition: opacity 250ms cubic-bezier(0.2, 0, 0, 1),
+    transform 250ms cubic-bezier(0.2, 0, 0, 1),
+    filter 250ms cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+
+.mbar-face.on {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+.mbar-face svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* the composer face doesn't scale — the container's stretch IS its geometry;
+   it resolves from blur just as the growth lands */
+.mbar-face.mbar-composer {
+  transform: none;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  transition: opacity 300ms cubic-bezier(0.2, 0, 0, 1) 80ms,
+    filter 300ms cubic-bezier(0.2, 0, 0, 1) 80ms;
+}
+
+.mbar-face.mbar-composer.on {
+  transform: none;
+}
+
+.mbar-field {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 17px;
+  line-height: 21px;
+  color: var(--gray-800);
+}
+
+.mbar-field .mbar-cursor2 {
+  width: 2px;
+  height: 21px;
+  background: #007aff;
+  border-radius: 1px;
+  animation: mbar-blink 1.1s steps(1) infinite;
+  margin-right: 2px;
+}
+
+.mbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mbar-plus {
+  color: var(--gray-1000);
+}
+
+.mbar-plus svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.mbar-send {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  background: var(--gray-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-100);
+}
+
+.mbar-send svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mbar-pill,
+  .mbar-circle,
+  .mbar-face {
+    transition-duration: 0ms;
+    transition-delay: 0ms;
+  }
+
+  .mbar-cursor,
+  .mbar-field .mbar-cursor2 {
+    animation: none;
+  }
+}
+
+/* ---------- article iPhone frames ---------- */
+
+.phones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  /* 35px bottom like .demo — the demo-caption pulls itself up 20px into it */
+  margin: 32px 0 35px;
+}
+
+.phone {
+  margin: 0;
+  width: 240px;
+  padding: 10px;
+  border-radius: 44px;
+  background: #1e1e1c;
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.25);
+}
+
+.phone img {
+  display: block;
+  width: 100%;
+  border-radius: 34px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .phone {
+    box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.12), 0 16px 32px -12px rgba(0, 0, 0, 0.6);
   }
 }

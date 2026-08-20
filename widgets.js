@@ -285,3 +285,57 @@ customElements.define('demo-loop', class extends Demo {
     });
   }
 });
+
+// Minote's bottom bar: the search pill is the long element, compose is the
+// circle beside it. Tap the pill and it melts into a search field; tap the
+// circle and it stretches into the two-row composer (the app's glass morph).
+customElements.define('demo-minote-bar', class extends Demo {
+  height = 150;
+  stage() {
+    const mag = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.75"/><path d="m13 13 4 4"/></svg>';
+    const pencil = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-6.5"/><path d="M17.8 3.6a1.9 1.9 0 0 1 2.7 2.7L13 13.8l-3.5.8.8-3.5 7.5-7.5z"/></svg>';
+    const x = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5.5 5.5 9 9M14.5 5.5l-9 9"/></svg>';
+    const plus = '<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M11 4v14M4 11h14"/></svg>';
+    const up = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15.5v-11m0 0-4.5 4.5M10 4.5l4.5 4.5"/></svg>';
+    return `
+      <div class="mbar">
+        <button class="mbar-pill" aria-label="Search">
+          <span class="mbar-pill-inner">${mag}<span class="mbar-cursor"></span><span>Search</span></span>
+        </button>
+        <button class="mbar-circle" aria-label="Compose">
+          <span class="mbar-face f-pencil on">${pencil}</span>
+          <span class="mbar-face f-x">${x}</span>
+          <span class="mbar-face mbar-composer f-composer">
+            <span class="mbar-field"><span class="mbar-cursor2"></span>Note to self…</span>
+            <span class="mbar-actions"><span class="mbar-plus">${plus}</span><span class="mbar-send">${up}</span></span>
+          </span>
+        </button>
+      </div>`;
+  }
+  init() {
+    const bar = this.querySelector('.mbar');
+    const face = (sel, on) => this.querySelector(sel).classList.toggle('on', on);
+    let mode = 'rest'; // rest | search | compose
+    const set = (m) => {
+      mode = m;
+      bar.classList.toggle('m-search', m === 'search');
+      bar.classList.toggle('m-compose', m === 'compose');
+      face('.f-pencil', m === 'rest');
+      face('.f-x', m === 'search');
+      face('.f-composer', m === 'compose');
+    };
+    this.querySelector('.mbar-pill').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (mode === 'rest') set('search');
+    });
+    this.querySelector('.mbar-circle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (mode === 'rest') set('compose');
+      else if (mode === 'search') set('rest'); // ✕ cancels the search
+      // compose: taps land in the field — tapping the stage is what dismisses
+    });
+    this.querySelector('.demo-stage').addEventListener('click', () => {
+      if (mode !== 'rest') set('rest');
+    });
+  }
+});
