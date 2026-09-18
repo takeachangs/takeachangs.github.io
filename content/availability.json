@@ -4,7 +4,7 @@
   "description": "Pick the days you're available.",
   "intro": [
     "I'm trying to find a few days that work for everyone. Tap every day you could make it — the more you mark, the easier this gets. Nothing here is binding.",
-    "When you're done, put your name in and hit the button. It gives you a link; send that back to me however you like."
+    "When you're done, put your name in and hit the button. Plans change; come back and send again and it just replaces your earlier answer."
   ],
   "from": "2026-10-01",
   "to": "2026-11-30",

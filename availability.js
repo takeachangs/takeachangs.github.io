@@ -2,11 +2,12 @@
 //
 // Two ways an answer travels back, picked by `endpoint` in content/availability.json:
 //   - endpoint set   -> POST JSON { name, note, from, days: ["YYYY-MM-DD", ...] } to it
+//                       (server/api/responses.js); `?results` fetches and renders
+//                       everyone's answers from the same URL.
 //   - endpoint empty -> the answer is packed into a share link (?r=<code>) the friend
 //                       copies and sends back; opening a link with one or more `r`
 //                       params shows the merged results instead of the form.
-// ponytail: a backend (Worker + KV, Formspree, Apps Script) can replace the link dance
-// by setting `endpoint` — the payload shape above is what it will receive.
+// If the endpoint is set but unreachable, submit falls back to the share link.
 (() => {
   const root = document.querySelector('.avail');
   if (!root) return;
@@ -189,16 +190,49 @@
 
   const params = new URLSearchParams(location.search);
   const codes = params.getAll('r').filter(Boolean);
+  const fromServer = !codes.length && Boolean(endpoint) && params.has('results');
 
-  function renderResults() {
-    const responses = codes.map(decode).filter(Boolean);
+  // endpoint mode: one GET, ISO days back to indices into this range
+  async function loadResponses() {
+    const res = await fetch(`${endpoint}?poll=${from}`, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(res.statusText);
+    const { responses } = await res.json();
+    return responses.map((r) => ({
+      name: String(r.name || ''),
+      note: String(r.note || ''),
+      days: (r.days || [])
+        .map((d) => dayIndex(parse(d)))
+        .filter((i) => i >= 0 && i < total)
+        .sort((a, b) => a - b),
+    }));
+  }
+
+  async function renderResults() {
     root.classList.add('results');
     document.body.classList.add('avail-results');
     form.hidden = true;
     summary.hidden = false;
 
+    let responses;
+    if (fromServer) {
+      summary.append(el('p', 'muted', 'Loading…'));
+      try {
+        responses = await loadResponses();
+      } catch {
+        summary.textContent = '';
+        summary.append(el('p', 'muted', "Couldn't load the answers. Try again in a moment."));
+        summary.append(arrowLink('Pick your days', location.pathname));
+        return;
+      }
+      summary.textContent = '';
+    } else {
+      responses = codes.map(decode).filter(Boolean);
+    }
+    // one answer per person, latest wins (the server already does this)
+    responses = [...new Map(responses.map((r) => [r.name.toLowerCase(), r])).values()];
+
     if (!responses.length) {
-      summary.append(el('p', 'muted', "That link didn't contain any answers."));
+      summary.append(el('p', 'muted', fromServer ? 'No answers yet.' : "That link didn't contain any answers."));
       summary.append(arrowLink('Pick your days', location.pathname));
       return;
     }
@@ -263,6 +297,12 @@
         : `${fmtDay.format(dateAt(i))}: nobody yet`;
     });
 
+    share.hidden = false;
+    if (fromServer) {
+      share.append(arrowLink('Add or change your days', location.pathname));
+      return;
+    }
+
     // merge another friend's link into this view
     const merge = el('form', 'avail-merge');
     const field = el('div', 'avail-field');
@@ -290,12 +330,11 @@
       for (const c of [...codes, ...fresh]) next.append('r', c);
       location.search = `?${next}`;
     });
-    share.hidden = false;
     share.append(merge);
     share.append(arrowLink('Add your own days', location.pathname));
   }
 
-  if (codes.length) {
+  if (codes.length || fromServer) {
     renderResults();
     return;
   }
@@ -384,9 +423,10 @@
   nameInput.addEventListener('input', update);
   noteInput.addEventListener('input', update);
 
-  const showShare = (link) => {
+  const showShare = (link, lead) => {
     share.textContent = '';
     share.hidden = false;
+    if (lead) share.append(el('p', 'muted', lead));
     const linkField = el('div', 'avail-field avail-link');
     const linkInput = el('input');
     linkInput.readOnly = true;
@@ -416,28 +456,53 @@
     }
     const days = [...selected].sort((a, b) => a - b);
 
+    const note = noteInput.value.trim();
+    const shareLink = () =>
+      `${location.origin}${location.pathname}?r=${encode({ n: name, m: note, d: packDays(days) })}`;
+
     if (endpoint) {
-      const payload = { name, note: noteInput.value.trim(), from, days: days.map((i) => iso(dateAt(i))) };
+      const payload = { name, note, from, days: days.map((i) => iso(dateAt(i))) };
       morph('Sending…');
+      let error;
       try {
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error(res.statusText);
-        delete label.dataset.busy;
-        morph('Sent!', 'Send');
+        if (!res.ok) {
+          let msg = '';
+          try {
+            msg = (await res.json()).error || '';
+          } catch {}
+          error = res.status < 500 && msg ? { msg } : { fallback: true };
+        }
       } catch {
-        delete label.dataset.busy;
+        error = { fallback: true };
+      }
+      delete label.dataset.busy;
+
+      if (!error) {
+        morph('Sent!', 'Send');
+        share.textContent = '';
+        share.hidden = false;
+        share.append(el('p', 'muted', `Thanks, ${name}. Send again any time to change your days.`));
+      } else if (error.msg) {
         morph('Try again', 'Send');
-        say("Couldn't send. Check your connection and retry.");
+        say(error.msg);
+      } else {
+        // server unreachable: hand them the link route instead
+        morph('Try again', 'Send');
+        const link = shareLink();
+        showShare(link, "The server didn't answer. Send me this link instead:");
+        const copied = await copyText(link);
+        say(copied ? 'Link copied.' : '');
+        if (!copied) share.querySelector('input').focus();
       }
       return;
     }
 
-    const code = encode({ n: name, m: noteInput.value.trim(), d: packDays(days) });
-    const link = `${location.origin}${location.pathname}?r=${code}`;
+    const link = shareLink();
     showShare(link);
     const copied = await copyText(link);
     morph(copied ? 'Copied!' : 'Copy below', 'Copy my link');

@@ -205,7 +205,8 @@ ${a.intro.map((p, i) => `          <p class="muted${i ? " mt-4" : ""}">${p}</p>`
               <span class="avail-status muted" role="status"></span>
             </div>
           </form>
-          <div class="avail-share" hidden></div>
+          <div class="avail-share" hidden></div>${a.endpoint ? `
+          <a class="arrow-link avail-results-link" href="?results">See who's free so far${ARROW_SVG}</a>` : ""}
           <noscript><p class="muted mt-4">This page needs JavaScript to pick days.</p></noscript>
         </div>`,
   scripts: `\n    <script src="/availability.js" defer></script>`,

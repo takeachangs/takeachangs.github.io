@@ -1617,7 +1617,8 @@ demo-minote-bar {
   min-width: 0;
 }
 
-.results .avail-share .arrow-link {
+.avail .arrow-link {
+  display: flex;
   width: fit-content;
   margin-top: 8px;
   font-weight: 400;
@@ -1625,8 +1626,12 @@ demo-minote-bar {
   text-decoration: none;
 }
 
-.results .avail-share .arrow-link:hover {
+.avail .arrow-link:hover {
   color: var(--label);
+}
+
+.avail-results-link {
+  margin-top: 28px;
 }
 
 @media (prefers-reduced-motion: reduce) {
