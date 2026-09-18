@@ -1339,88 +1339,102 @@ demo-minote-bar {
   display: none;
 }
 
-.avail-months {
+/* week nav */
+
+.avail-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.avail-week {
+  min-width: 120px;
+  text-align: center;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--label);
+}
+
+.avail-prev,
+.avail-next {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--gray-1100);
+  transition: background 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.avail-prev:hover:not(:disabled),
+.avail-next:hover:not(:disabled) {
+  background: var(--gray-300);
+  color: var(--label);
+}
+
+.avail-prev:disabled,
+.avail-next:disabled {
+  color: var(--gray-700);
+  cursor: default;
+}
+
+.avail-prev:focus-visible,
+.avail-next:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+/* the sheet: time gutter + 7 day columns, one row per half hour */
+
+.avail-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 40px 48px;
+  grid-template-columns: 44px repeat(7, minmax(0, 1fr));
+  column-gap: 2px;
   user-select: none;
   -webkit-user-select: none;
 }
 
-@media (min-width: 640px) {
-  .avail-months {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.avail-corner {
+  height: 40px;
 }
 
-.avail-month-label {
-  margin-bottom: 12px;
-  font-weight: 500;
-  color: var(--label);
+.avail-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 40px;
+  padding-bottom: 6px;
+  line-height: 1.1;
 }
 
-.avail-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  touch-action: pan-y; /* vertical swipes still scroll; sideways drags paint days */
-}
-
-.avail-dow {
-  padding-bottom: 4px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 16px;
+.avail-head-day {
+  font-size: 11px;
   color: var(--gray-900);
 }
 
-.day {
-  position: relative;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
+.avail-head-date {
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--gray-1200);
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    background 120ms cubic-bezier(0.4, 0, 0.2, 1),
-    color 120ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  color: var(--label);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .day:not(:disabled):hover {
-    background: var(--gray-300);
-  }
+.avail-head.out {
+  opacity: 0.4;
 }
 
-.day:not(:disabled):active {
-  transform: scale(0.92);
+.avail-head.today .avail-head-date {
+  position: relative;
 }
 
-.day[aria-pressed="true"] {
-  background: var(--gray-1200);
-  color: var(--gray-100);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .day[aria-pressed="true"]:hover {
-    background: var(--btn-hover);
-  }
-}
-
-.day.out {
-  color: var(--gray-800);
-  cursor: default;
-}
-
-.day.today span::after {
+.avail-head.today .avail-head-date::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 5px;
+  bottom: -5px;
   width: 4px;
   height: 4px;
   margin-left: -2px;
@@ -1428,28 +1442,105 @@ demo-minote-bar {
   background: currentColor;
 }
 
-.day:focus-visible {
+.avail-time {
+  height: 22px;
+  padding-right: 8px;
+  text-align: right;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--gray-900);
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-5px); /* sits on the hour line, not below it */
+  white-space: nowrap;
+}
+
+.slot {
+  height: 22px;
+  border-top: 1px solid var(--gray-400);
+  background: var(--gray-200);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none; /* a touch drag on the sheet paints; scroll from the gutter or margins */
+  transition:
+    background 100ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slot:not(.hour) {
+  border-top-style: dashed;
+  border-top-color: var(--gray-300);
+}
+
+.slot:first-of-type,
+.avail-grid > .slot:nth-child(-n + 16) {
+  border-top-color: var(--gray-500);
+}
+
+.avail-grid > .slot:nth-child(-n + 16):not(.hour) {
+  border-top-style: solid;
+}
+
+/* first slot row squares off the column tops, last row squares off the bottoms */
+.avail-grid > .slot:nth-child(-n + 16) {
+  border-radius: 4px 4px 0 0;
+}
+
+.avail-grid > .slot:nth-last-child(-n + 7) {
+  border-radius: 0 0 4px 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .slot:not(:disabled):hover {
+    background: var(--gray-400);
+  }
+}
+
+.slot[aria-pressed="true"] {
+  background: var(--gray-1200);
+  border-top-color: var(--gray-1100);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .slot[aria-pressed="true"]:hover {
+    background: var(--btn-hover);
+  }
+}
+
+.slot.out {
+  background: transparent;
+  border-top-color: var(--gray-300);
+  cursor: default;
+}
+
+.slot:focus-visible {
   outline: none;
+  position: relative;
+  z-index: 1;
   box-shadow:
     0 0 0 2px var(--gray-100),
     0 0 0 4px var(--gray-1100);
 }
 
-/* results view: cell shade = share of people free that day */
-.results .day.has {
-  background: color-mix(in srgb, var(--gray-1200) calc(var(--n) * 100%), var(--gray-300));
+/* results view: cell shade = share of people free then */
+.results .slot {
+  cursor: pointer;
 }
 
-.results .day.hi {
-  color: var(--gray-100);
+.results .slot.has {
+  background: color-mix(in srgb, var(--gray-1200) calc(var(--n) * 100%), var(--gray-400));
+  border-top-color: transparent;
 }
 
-.results .day:not(.has):not(:disabled) {
-  color: var(--gray-1000);
+.results .slot.active {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1200);
 }
 
-.results .day.active {
-  box-shadow: 0 0 0 2px var(--gray-100), 0 0 0 4px var(--gray-1200);
+.avail-hint {
+  margin-top: 16px;
+  font-size: 13px;
 }
 
 .avail-summary {
@@ -1476,7 +1567,7 @@ demo-minote-bar {
 }
 
 .avail-detail {
-  margin-top: 20px;
+  margin-top: 12px;
   min-height: 26px;
 }
 
@@ -1634,8 +1725,14 @@ demo-minote-bar {
   margin-top: 28px;
 }
 
+.results .avail-results-link {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .day,
+  .slot,
+  .avail-prev,
+  .avail-next,
   .avail-submit,
   .avail-submit span {
     transition: none;

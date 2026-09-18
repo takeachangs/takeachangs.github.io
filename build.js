@@ -176,7 +176,7 @@ ${marked.parse(post.body).replace(/<p>(<demo-[\w-]+[^>]*><\/demo-[\w-]+>)<\/p>/g
   scripts: `\n    <script src="/widgets.js" defer></script>`,
 });
 
-// Unlisted availability poll: friends pick days, see availability.js for how answers travel back
+// Unlisted availability poll: friends paint 30-minute blocks, see availability.js for how answers travel back
 const attr = (v) => esc(String(v ?? "")).replace(/"/g, "&quot;");
 const availabilityPage = (a) => shell({
   title: a.title,
@@ -187,13 +187,19 @@ const availabilityPage = (a) => shell({
 ${a.intro.map((p, i) => `          <p class="muted${i ? " mt-4" : ""}">${p}</p>`).join("\n")}
         </div>
 
-        <div class="avail" data-from="${a.from}" data-to="${a.to}" data-endpoint="${attr(a.endpoint)}" data-email="${attr(a.email)}">
+        <div class="avail" data-from="${a.from}" data-to="${a.to}" data-hours-from="${attr(a.hours?.from ?? "09:00")}" data-hours-to="${attr(a.hours?.to ?? "22:00")}" data-endpoint="${attr(a.endpoint)}" data-email="${attr(a.email)}">
           <div class="avail-summary" hidden></div>
-          <div class="avail-months"></div>
+          <div class="avail-nav">
+            <button type="button" class="avail-prev" aria-label="Previous week">&#8249;</button>
+            <span class="avail-week" aria-live="polite"></span>
+            <button type="button" class="avail-next" aria-label="Next week">&#8250;</button>
+          </div>
+          <div class="avail-sheet"></div>
+          <p class="avail-hint muted">${a.timezone ? `Times are in ${a.timezone}. ` : ""}Drag to paint a block of time; tap to toggle one.</p>
           <p class="avail-detail muted" hidden></p>
           <form class="avail-form">
             <div class="avail-meta">
-              <span class="avail-count muted">No days selected</span>
+              <span class="avail-count muted">Nothing selected</span>
               <button type="button" class="avail-clear muted" hidden>Clear</button>
             </div>
             <label for="avail-name" class="sr-only">Your name</label>
@@ -207,7 +213,7 @@ ${a.intro.map((p, i) => `          <p class="muted${i ? " mt-4" : ""}">${p}</p>`
           </form>
           <div class="avail-share" hidden></div>${a.endpoint ? `
           <a class="arrow-link avail-results-link" href="?results">See who's free so far${ARROW_SVG}</a>` : ""}
-          <noscript><p class="muted mt-4">This page needs JavaScript to pick days.</p></noscript>
+          <noscript><p class="muted mt-4">This page needs JavaScript to pick times.</p></noscript>
         </div>`,
   scripts: `\n    <script src="/availability.js" defer></script>`,
 });

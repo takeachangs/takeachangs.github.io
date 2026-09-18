@@ -1,9 +1,10 @@
 // /api/responses — the availability poll's backend, one Vercel function.
 //
-//   POST { name, note, from, days: ["YYYY-MM-DD", ...] }
+//   POST { name, note, from, slots: { "YYYY-MM-DD": [slot, ...] } }
+//        slot = half-hour index from midnight (0..47);
 //        stores one entry per (poll, name); sending again overwrites.
 //   GET  ?poll=YYYY-MM-DD
-//        -> { poll, responses: [{ name, note, days, at }, ...] } oldest first.
+//        -> { poll, responses: [{ name, note, slots, at }, ...] } oldest first.
 //
 // A "poll" is keyed by the range's start date, so changing `from` in
 // content/availability.json starts a fresh, empty result set.
@@ -23,10 +24,11 @@ const envOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.t
 const ALLOWED = envOrigins.length ? envOrigins : DEFAULT_ORIGINS;
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const MAX_BODY = 8 * 1024;
+const MAX_BODY = 32 * 1024;
 const MAX_NAME = 40;
 const MAX_NOTE = 200;
 const MAX_DAYS = 400;
+const SLOTS_IN_DAY = 48;
 const MAX_RESPONSES = 200;
 
 const key = (poll) => `avail:${poll}`;
@@ -63,11 +65,20 @@ function validate(body) {
   const note = String(body.note ?? '').trim().slice(0, MAX_NOTE);
   const poll = String(body.from ?? '');
   if (!DATE.test(poll)) return { error: 'from must be YYYY-MM-DD' };
-  if (!Array.isArray(body.days)) return { error: 'days must be an array' };
-  if (body.days.length > MAX_DAYS) return { error: 'too many days' };
-  const days = [...new Set(body.days.map(String))].filter((d) => DATE.test(d) && d >= poll).sort();
-  if (!days.length) return { error: 'pick at least one day' };
-  return { poll, response: { name, note, days, at: new Date().toISOString() } };
+  const raw = body.slots;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { error: 'slots must be an object of dates' };
+  const dates = Object.keys(raw).filter((d) => DATE.test(d) && d >= poll).sort();
+  if (dates.length > MAX_DAYS) return { error: 'too many days' };
+  const slots = {};
+  for (const d of dates) {
+    if (!Array.isArray(raw[d])) continue;
+    const list = [...new Set(raw[d].map(Number))]
+      .filter((s) => Number.isInteger(s) && s >= 0 && s < SLOTS_IN_DAY)
+      .sort((a, b) => a - b);
+    if (list.length) slots[d] = list;
+  }
+  if (!Object.keys(slots).length) return { error: 'pick at least one block' };
+  return { poll, response: { name, note, slots, at: new Date().toISOString() } };
 }
 
 const parseStored = (v) => (typeof v === 'string' ? JSON.parse(v) : v);
