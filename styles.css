@@ -1324,3 +1324,315 @@ demo-minote-bar {
     box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.12), 0 16px 32px -12px rgba(0, 0, 0, 0.6);
   }
 }
+
+/* ---------- Availability (/availability/) ---------- */
+
+.avail {
+  margin-top: 48px;
+}
+
+.avail [hidden] {
+  display: none !important;
+}
+
+.avail-results .avail-intro {
+  display: none;
+}
+
+.avail-months {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px 48px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media (min-width: 640px) {
+  .avail-months {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.avail-month-label {
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.avail-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  touch-action: pan-y; /* vertical swipes still scroll; sideways drags paint days */
+}
+
+.avail-dow {
+  padding-bottom: 4px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gray-900);
+}
+
+.day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray-1200);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .day:not(:disabled):hover {
+    background: var(--gray-300);
+  }
+}
+
+.day:not(:disabled):active {
+  transform: scale(0.92);
+}
+
+.day[aria-pressed="true"] {
+  background: var(--gray-1200);
+  color: var(--gray-100);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .day[aria-pressed="true"]:hover {
+    background: var(--btn-hover);
+  }
+}
+
+.day.out {
+  color: var(--gray-800);
+  cursor: default;
+}
+
+.day.today span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.day:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+/* results view: cell shade = share of people free that day */
+.results .day.has {
+  background: color-mix(in srgb, var(--gray-1200) calc(var(--n) * 100%), var(--gray-300));
+}
+
+.results .day.hi {
+  color: var(--gray-100);
+}
+
+.results .day:not(.has):not(:disabled) {
+  color: var(--gray-1000);
+}
+
+.results .day.active {
+  box-shadow: 0 0 0 2px var(--gray-100), 0 0 0 4px var(--gray-1200);
+}
+
+.avail-summary {
+  margin-bottom: 40px;
+}
+
+.avail-summary p:first-child {
+  color: var(--label);
+}
+
+.avail-notes {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.avail-notes li + li {
+  margin-top: 6px;
+}
+
+.avail-notes strong {
+  font-weight: 500;
+  color: var(--label);
+}
+
+.avail-detail {
+  margin-top: 20px;
+  min-height: 26px;
+}
+
+/* form */
+
+.avail-form {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.avail-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.avail-clear {
+  text-decoration: underline;
+  text-underline-position: from-font;
+  text-decoration-color: var(--gray-800);
+}
+
+.avail-clear:hover {
+  color: var(--label);
+}
+
+.avail-field {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--form-bg);
+  box-shadow: var(--form-shadow);
+}
+
+.avail-field:focus-within {
+  box-shadow: var(--form-ring), var(--form-shadow);
+}
+
+.avail-field input {
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 18px;
+  outline: none;
+}
+
+.avail-field input::placeholder {
+  color: var(--gray-900);
+}
+
+.avail-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avail-submit {
+  height: 40px;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--gray-1200);
+  padding: 0 18px;
+  font-weight: 500;
+  color: var(--gray-100);
+  outline: none;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.avail-submit:hover {
+  background: var(--btn-hover);
+}
+
+.avail-submit:active {
+  transform: scale(0.97);
+}
+
+.avail-submit:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+.avail-submit span {
+  display: block;
+  transition:
+    opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    filter 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.avail-submit span.morph-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(2px);
+}
+
+.avail-submit span.morph-in {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(2px);
+  transition: none;
+}
+
+.avail-status:empty {
+  display: none;
+}
+
+/* share box (link mode) and merge box (results mode) */
+
+.avail-share {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.avail-link input {
+  font-family: Mono, ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--gray-1100);
+}
+
+.avail-merge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avail-merge .avail-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.results .avail-share .arrow-link {
+  width: fit-content;
+  margin-top: 8px;
+  font-weight: 400;
+  color: var(--gray-1100);
+  text-decoration: none;
+}
+
+.results .avail-share .arrow-link:hover {
+  color: var(--label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day,
+  .avail-submit,
+  .avail-submit span {
+    transition: none;
+  }
+}

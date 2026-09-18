@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "nod
 import { Marked } from "./lib/marked.esm.js";
 
 const site = JSON.parse(readFileSync("content/site.json", "utf8"));
+const availability = JSON.parse(readFileSync("content/availability.json", "utf8"));
 
 /* ---------- posts ---------- */
 
@@ -80,7 +81,7 @@ const marked = new Marked({
 
 /* ---------- templates ---------- */
 
-const shell = ({ title, description, content, scripts = "" }) => `<!doctype html>
+const shell = ({ title, description, content, scripts = "", head = "" }) => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -91,7 +92,7 @@ const shell = ({ title, description, content, scripts = "" }) => `<!doctype html
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css" />${head}
   </head>
   <body>
     <div class="layout-root">
@@ -175,6 +176,41 @@ ${marked.parse(post.body).replace(/<p>(<demo-[\w-]+[^>]*><\/demo-[\w-]+>)<\/p>/g
   scripts: `\n    <script src="/widgets.js" defer></script>`,
 });
 
+// Unlisted availability poll: friends pick days, see availability.js for how answers travel back
+const attr = (v) => esc(String(v ?? "")).replace(/"/g, "&quot;");
+const availabilityPage = (a) => shell({
+  title: a.title,
+  description: a.description,
+  head: `\n    <meta name="robots" content="noindex" />`,
+  content: `        <span class="section-label">${a.title}</span>
+        <div class="avail-intro">
+${a.intro.map((p, i) => `          <p class="muted${i ? " mt-4" : ""}">${p}</p>`).join("\n")}
+        </div>
+
+        <div class="avail" data-from="${a.from}" data-to="${a.to}" data-endpoint="${attr(a.endpoint)}" data-email="${attr(a.email)}">
+          <div class="avail-summary" hidden></div>
+          <div class="avail-months"></div>
+          <p class="avail-detail muted" hidden></p>
+          <form class="avail-form">
+            <div class="avail-meta">
+              <span class="avail-count muted">No days selected</span>
+              <button type="button" class="avail-clear muted" hidden>Clear</button>
+            </div>
+            <label for="avail-name" class="sr-only">Your name</label>
+            <div class="avail-field"><input id="avail-name" required autocomplete="name" placeholder="Your name" /></div>
+            <label for="avail-note" class="sr-only">Note</label>
+            <div class="avail-field"><input id="avail-note" placeholder="Anything to add? (optional)" /></div>
+            <div class="avail-actions">
+              <button type="submit" class="avail-submit"><span>${a.endpoint ? "Send" : "Copy my link"}</span></button>
+              <span class="avail-status muted" role="status"></span>
+            </div>
+          </form>
+          <div class="avail-share" hidden></div>
+          <noscript><p class="muted mt-4">This page needs JavaScript to pick days.</p></noscript>
+        </div>`,
+  scripts: `\n    <script src="/availability.js" defer></script>`,
+});
+
 /* ---------- write ---------- */
 
 writeFileSync("index.html", homepage());
@@ -185,4 +221,7 @@ for (const post of posts) {
   mkdirSync(`blog/${post.slug}`, { recursive: true });
   writeFileSync(`blog/${post.slug}/index.html`, postPage(post));
 }
-console.log(`built index.html + ${posts.length} posts`);
+rmSync(availability.slug, { recursive: true, force: true });
+mkdirSync(availability.slug, { recursive: true });
+writeFileSync(`${availability.slug}/index.html`, availabilityPage(availability));
+console.log(`built index.html + ${posts.length} posts + /${availability.slug}/`);

@@ -17,9 +17,10 @@ A dependency-free static portfolio site whose design recreates https://emilkowal
 
 - `content/site.json` — all homepage data: name, role, bio paragraphs (HTML allowed), projects, newsletter copy, footer links.
 - `content/posts/*.md` — articles. Front matter `title` / `description` / `date`; filename (minus `.md`) is the slug and the URL `/blog/<slug>/`. The homepage Blog list is generated from these, newest first, capped at `site.json`'s `blogLimit` (default 5); a "See all →" arrow link under the list leads to the generated `/blog/` index page that lists every post.
+- `content/availability.json` — the unlisted availability poll at `/<slug>/` (default `/availability/`, `noindex`, not linked from the homepage): `title`, `intro` paragraphs, the `from`/`to` date range (inclusive, `YYYY-MM-DD`), `endpoint` and `email`. Runtime lives in `availability.js`. With `endpoint` empty the friend's answer is packed into a share link (`?r=<base64url>`) they copy and send back; opening a URL with one or more `r` params renders the merged results (per-day counts, best days, notes, a box to paste further links in). Setting `endpoint` switches the button to a JSON `POST` of `{ name, note, from, days }` instead — the hook point for a real backend.
 - `build.js` — the entire build: front-matter parser, marked with custom renderers (`##` → self-linking anchor with slugged id; fenced code → highlighted line grid via a small regex highlighter for `js`/`css`), demo-widget tags unwrapped from `<p>`, and all page templates as template literals. To change page structure, edit the templates here.
-- Generated output — **never edit by hand**: `index.html` and `blog/` (the build deletes and recreates `blog/` every run, so removed or renamed posts leave no stale pages).
-- Hand-maintained runtime assets: `styles.css` (all styling, including design tokens), `script.js` (newsletter label morph; loaded on every page), `widgets.js` (post demo widgets; post pages only), `fonts/`.
+- Generated output — **never edit by hand**: `index.html`, `blog/` and `availability/` (the build deletes and recreates `blog/` and the availability dir every run, so removed or renamed posts leave no stale pages).
+- Hand-maintained runtime assets: `styles.css` (all styling, including design tokens), `script.js` (newsletter label morph; loaded on every page), `widgets.js` (post demo widgets; post pages only), `availability.js` (availability page only), `fonts/`.
 
 ## Design fidelity rules
 
@@ -42,4 +43,4 @@ The design was matched to emilkowal.ski numerically (bounding-rect comparisons a
 
 ## Still placeholder
 
-Project links (`#`), X/GitHub usernames in `content/site.json`, and the newsletter backend.
+Project links (`#`), X/GitHub usernames in `content/site.json`, the newsletter backend, and the availability `endpoint` (the share-link fallback works without one).
