@@ -388,8 +388,8 @@
       setStatus('');
       try {
         location.hash = await storeCreate(event);
-      } catch {
-        setStatus('Couldn’t reach the store. Check your connection and try again.');
+      } catch (err) {
+        setStatus(`Couldn’t reach the store (${err && err.message ? err.message : 'unknown error'}). Check your connection and try again.`);
         creating = false;
         submit.disabled = false;
       }
@@ -717,7 +717,7 @@
 
     if (STORE && ID_RE.test(hash)) {
       renderLoading();
-      try { ev = await storeLoad(hash); } catch { renderError('Couldn’t load this event. The store may be waking up — try again in a moment.'); return; }
+      try { ev = await storeLoad(hash); } catch (err) { renderError(`Couldn’t load this event (${err && err.message ? err.message : 'unknown error'}). The store may be waking up — try again in a moment.`); return; }
       if (hash !== location.hash.slice(1)) return; // navigated away while loading
       if (!ev) { renderError('This event doesn’t exist, or the link is incomplete.'); return; }
       storeId = id = hash;
