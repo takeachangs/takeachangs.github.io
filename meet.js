@@ -126,7 +126,8 @@
   /* ---------- store (Supabase via PostgREST) ---------- */
 
   const api = async (path, { method = 'GET', body, prefer } = {}) => {
-    const headers = { apikey: STORE.key, Authorization: `Bearer ${STORE.key}`, Accept: 'application/json' };
+    const headers = { apikey: STORE.key, Accept: 'application/json' };
+    if (STORE.key.startsWith('eyJ')) headers.Authorization = `Bearer ${STORE.key}`; // legacy anon JWT; sb_publishable_ keys use apikey alone
     if (body) headers['Content-Type'] = 'application/json';
     if (prefer) headers.Prefer = prefer;
     const res = await fetch(`${STORE.url}/rest/v1/${path}`, { method, headers, body: body && JSON.stringify(body), keepalive: method !== 'GET' });

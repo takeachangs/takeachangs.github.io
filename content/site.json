@@ -4,8 +4,8 @@
   "description": "AI Engineer",
   "blogLimit": 5,
   "meet": {
-    "supabaseUrl": "",
-    "supabaseAnonKey": ""
+    "supabaseUrl": "https://ktgtgvecypnnkwrxkzlm.supabase.co",
+    "supabaseAnonKey": "sb_publishable_vvNuZviGCREwx-FrYOBm3A_eo5nfTr_"
   },
   "today": [
     "I'm a Forward Deployed AI Engineer at <a href=\"https://warmblood.kr/\" target=\"_blank\">Warmblood</a>, building <a href=\"https://monocle-ai.com/\" target=\"_blank\">Monocle AI</a> and <a href=\"https://safetysnap.ai/\" target=\"_blank\">SafetySnap</a>. My work lives in the edges — the connections nobody thought to draw.",
