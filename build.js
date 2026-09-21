@@ -168,11 +168,12 @@ ${posts.map((p) => listItem({ href: `/blog/${p.slug}/`, name: p.title, descripti
 
 // /meet/ — group scheduler; the page is a shell, meet.js renders the rest.
 // With site.json's meet.supabaseUrl/AnonKey set, answers live in Supabase; otherwise in the link.
+const attr = (v) => esc(String(v)).replace(/"/g, "&quot;");
 const meetStore = site.meet?.supabaseUrl && site.meet?.supabaseAnonKey ? site.meet : null;
 const meetPage = () => shell({
   title: "Meet",
   description: `Find a time that works for everyone. A small scheduler by ${site.name}.`,
-  content: `        <div class="meet"${meetStore ? ` data-store-url="${meetStore.supabaseUrl}" data-store-key="${meetStore.supabaseAnonKey}"` : ""}>
+  content: `        <div class="meet"${meetStore ? ` data-store-url="${attr(meetStore.supabaseUrl)}" data-store-key="${attr(meetStore.supabaseAnonKey)}"` : ""}>
           <div class="meet-intro">
             <span class="section-label">Meet</span>
             <p class="muted">${meetStore

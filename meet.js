@@ -180,6 +180,8 @@
   let cells = [];
   let dragging = false;
   let pending = null;                         // store mode: { [name_key]: { name, bits } } waiting to be written
+  let inflight = null;                        // the batch flush() is currently writing
+  const known = new Set();                    // name keys that have a non-empty row in the store (so a clear is worth writing)
   let saveTimer = 0, syncTimer = 0, saving = false;
 
   const others = () => ev.r.filter((r) => !(mine.saved && same(r.n, mine.saved)) && !(mine.name.trim() && same(r.n, mine.name)));
@@ -194,10 +196,16 @@
       ev.r = others();
       if (name && any) ev.r.push({ n: name, a: packed, t: Date.now() });
       if (storeId) {
+        // Only rows that exist get cleared; a name that was never written (each prefix while typing) is just dropped.
         pending = pending || {};
-        if (mine.saved && !same(mine.saved, name)) pending[key(mine.saved)] = { name: mine.saved, bits: '' }; // renamed: clear the old row
-        if (name) pending[key(name)] = { name, bits: any ? packed : '' };
-        queueSave();
+        if (mine.saved && !same(mine.saved, name)) {
+          const old = key(mine.saved);
+          if (known.has(old)) pending[old] = { name: mine.saved, bits: '' }; else delete pending[old];
+        }
+        if (name && any) pending[key(name)] = { name, bits: packed };
+        else if (name && known.has(key(name))) pending[key(name)] = { name, bits: '' };
+        else if (name) delete pending[key(name)];
+        if (Object.keys(pending).length) queueSave(); else pending = null;
       }
     }
     mine.saved = name && any ? name : '';
@@ -218,29 +226,43 @@
 
   async function flush() {
     if (!storeId || !pending || saving) return;
+    const sid = storeId;
     const batch = pending;
     pending = null;
+    inflight = batch;
     saving = true;
+    let ok = false;
     try {
-      for (const { name, bits } of Object.values(batch)) await storeSave(storeId, name, bits);
+      for (const [k, { name, bits }] of Object.entries(batch)) {
+        await storeSave(sid, name, bits);
+        if (bits) known.add(k); else known.delete(k);
+      }
+      ok = true;
       setStatus('');
     } catch {
-      pending = { ...batch, ...(pending || {}) }; // newer edits win over the failed batch
+      pending = { ...batch, ...(pending || {}) }; // newer edits win over the failed batch; sync() retries it
       setStatus('Couldn’t save your answer. Retrying…');
     } finally {
       saving = false;
-      if (pending) queueSave(); // edits that arrived mid-flight
+      inflight = null;
+      if (ok && pending) queueSave(); // edits that arrived mid-flight
     }
   }
 
   // Store mode: pull everyone else's answers while the tab is open.
   async function sync() {
-    if (!storeId || document.hidden || dragging) return;
+    const sid = storeId;
+    if (!sid || document.hidden || dragging) return;
     let rows;
-    try { rows = await storeResponses(storeId); } catch { return; }
+    try { rows = await storeResponses(sid); } catch { return; }
+    if (storeId !== sid || dragging) return; // navigated away (or started painting) while loading
+    for (const r of rows) known.add(key(r.n));
     if (pending) flush();
+    // Rows this tab is writing or has just written are ours, not the server's, until the write lands.
+    const skip = new Set([...Object.keys(pending || {}), ...Object.keys(inflight || {})]);
+    if (mine.saved) skip.add(key(mine.saved));
     const me = mine.saved ? [ev.r.find((r) => same(r.n, mine.saved))].filter(Boolean) : [];
-    const next = [...rows.filter((r) => !me.some((m) => same(m.n, r.n))), ...me];
+    const next = [...rows.filter((r) => !skip.has(key(r.n))), ...me];
     if (JSON.stringify(next) !== JSON.stringify(ev.r)) { ev.r = next; refresh(); }
   }
 
@@ -689,6 +711,7 @@
     clearTimeout(saveTimer);
     storeId = '';
     pending = null;
+    known.clear();
     const hash = location.hash.slice(1);
 
     if (STORE && ID_RE.test(hash)) {
@@ -697,6 +720,7 @@
       if (hash !== location.hash.slice(1)) return; // navigated away while loading
       if (!ev) { renderError('This event doesn’t exist, or the link is incomplete.'); return; }
       storeId = id = hash;
+      for (const r of ev.r) known.add(key(r.n));
       const saved = local.get('meet:' + storeId) || {};
       mine.name = typeof saved.me === 'string' ? saved.me : (local.get('meet:name') || '');
       startEvent();

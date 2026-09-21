@@ -7,10 +7,13 @@
 -- row with empty bits (the page hides those). There are no accounts — a name
 -- is the identity, same as LettuceMeet.
 
+-- Element check for the days array: Postgres applies a domain's constraint to every element.
+create domain public.meet_day as text check (value ~ '^\d{4}-\d{2}-\d{2}$');
+
 create table public.meet_events (
   id          text primary key check (id ~ '^[A-Za-z0-9]{12}$'),
   title       text not null default '' check (char_length(title) <= 80),
-  days        text[] not null check (array_length(days, 1) between 1 and 62),
+  days        public.meet_day[] not null check (cardinality(days) between 1 and 62),  -- cardinality, not array_length: '{}' must fail, not pass as NULL
   start_hour  int not null check (start_hour between 0 and 23),
   end_hour    int not null check (end_hour between 1 and 24 and end_hour > start_hour),
   tz          text not null default '' check (char_length(tz) <= 64),
@@ -19,17 +22,23 @@ create table public.meet_events (
 
 create table public.meet_responses (
   event_id    text not null references public.meet_events (id) on delete cascade,
-  name_key    text not null check (char_length(name_key) between 1 and 40),  -- trimmed, lower-cased
-  name        text not null check (char_length(name) between 1 and 40),      -- as typed
+  name_key    text not null check (char_length(name_key) between 1 and 40),  -- lower(trimmed name); set by the trigger, never trusted from the client
+  name        text not null check (char_length(name) between 1 and 40),      -- as typed, trimmed
   bits        text not null default '' check (char_length(bits) <= 600),     -- base64url bitmask, '' = cleared
   updated_at  timestamptz not null default now(),
   primary key (event_id, name_key)
 );
 
--- Server-side timestamps: the page never sends updated_at.
-create or replace function public.meet_touch() returns trigger language plpgsql as $$
+-- Server-side identity and timestamps. name_key is derived here so a crafted
+-- request can't file several rows under one displayed name (BEFORE INSERT runs
+-- ahead of ON CONFLICT arbitration, so the upsert keys on the derived value),
+-- and updated_at can't be spoofed because the page never sends it.
+create or replace function public.meet_touch() returns trigger
+language plpgsql set search_path = '' as $$
 begin
-  new.updated_at = now();
+  new.name       = pg_catalog.btrim(new.name);
+  new.name_key   = pg_catalog.lower(new.name);
+  new.updated_at = pg_catalog.now();
   return new;
 end $$;
 
@@ -53,3 +62,10 @@ create policy "anyone can change responses" on public.meet_responses for update 
 revoke all on public.meet_events, public.meet_responses from anon;
 grant select, insert on public.meet_events to anon;
 grant select, insert, update on public.meet_responses to anon;
+
+-- Optional housekeeping. Nothing can be deleted through the anon key, so rows
+-- only ever accumulate. If the project has pg_cron enabled (Database →
+-- Extensions), this drops events after 180 days; responses cascade.
+--
+-- select cron.schedule('meet-cleanup', '0 4 * * *',
+--   $$delete from public.meet_events where created_at < now() - interval '180 days'$$);
