@@ -1,4 +1,4 @@
-// Static site build: content/*.json + content/posts/*.md -> index.html + blog/<slug>/index.html
+// Static site build: content/*.json + content/posts/*.md -> index.html + blog/<slug>/index.html + meet/index.html
 // Run: node build.js
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
 import { Marked } from "./lib/marked.esm.js";
@@ -166,6 +166,21 @@ ${posts.map((p) => listItem({ href: `/blog/${p.slug}/`, name: p.title, descripti
         </div>`,
 });
 
+// /meet/ — link-only group scheduler; the page is a shell, meet.js renders the rest
+const meetPage = () => shell({
+  title: "Meet",
+  description: `Find a time that works for everyone. A link-only scheduler by ${site.name}.`,
+  content: `        <div class="meet">
+          <div class="meet-intro">
+            <span class="section-label">Meet</span>
+            <p class="muted">Pick the days and hours that could work, share the link, and everyone paints in when they're free. There's no account and no server: every answer lives in the link itself, so always pass along the newest one.</p>
+            <noscript><p class="muted mt-4">This page needs JavaScript.</p></noscript>
+          </div>
+          <div class="meet-app"></div>
+        </div>`,
+  scripts: `\n    <script src="/meet.js" defer></script>`,
+});
+
 const postPage = (post) => shell({
   title: post.title,
   description: post.description,
@@ -181,8 +196,10 @@ writeFileSync("index.html", homepage());
 rmSync("blog", { recursive: true, force: true }); // deleted/renamed posts leave no stale pages
 mkdirSync("blog", { recursive: true });
 writeFileSync("blog/index.html", blogIndex());
+mkdirSync("meet", { recursive: true });
+writeFileSync("meet/index.html", meetPage());
 for (const post of posts) {
   mkdirSync(`blog/${post.slug}`, { recursive: true });
   writeFileSync(`blog/${post.slug}/index.html`, postPage(post));
 }
-console.log(`built index.html + ${posts.length} posts`);
+console.log(`built index.html + ${posts.length} posts + meet/`);

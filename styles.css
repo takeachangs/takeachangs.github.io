@@ -1324,3 +1324,554 @@ demo-minote-bar {
     box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.12), 0 16px 32px -12px rgba(0, 0, 0, 0.6);
   }
 }
+
+/* ---------- Meet (/meet/) ---------- */
+
+.meet-intro p {
+  margin-top: 0;
+}
+
+.meet-label {
+  display: block;
+  margin: 32px 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.meet-field {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--form-bg);
+  box-shadow: var(--form-shadow);
+  color: var(--gray-1200);
+  outline: none;
+  transition: box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.meet-field::placeholder {
+  color: var(--gray-900);
+}
+
+.meet-field:focus-visible {
+  box-shadow: var(--form-ring), var(--form-shadow);
+}
+
+select.meet-field {
+  width: auto;
+  padding-right: 34px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%238d8d86' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.meet-hours {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Calendar day picker */
+.meet-cal {
+  max-width: 336px;
+}
+
+.meet-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.meet-cal-nav {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--gray-1000);
+}
+
+.meet-cal-nav svg {
+  width: 16px;
+  height: 16px;
+}
+
+.meet-cal-nav:hover {
+  background: var(--gray-300);
+  color: var(--label);
+}
+
+.meet-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.meet-cal-dow {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--gray-1000);
+}
+
+.meet-cal-day {
+  position: relative;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray-1200);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.meet-cal-day:hover:not(:disabled) {
+  background: var(--gray-300);
+}
+
+.meet-cal-day:disabled {
+  color: var(--gray-800);
+  cursor: default;
+}
+
+.meet-cal-day.today::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.meet-cal-day.on,
+.meet-cal-day.on:hover {
+  background: var(--gray-1200);
+  color: var(--gray-100);
+}
+
+.meet-cal-day:focus-visible,
+.meet-cal-nav:focus-visible,
+.meet-chip:focus-visible,
+.meet-seg button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+/* Buttons */
+.meet-btn-primary {
+  display: inline-block;
+  margin-top: 32px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  background: var(--gray-1200);
+  font-weight: 500;
+  color: var(--gray-100);
+  outline: none;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), opacity 150ms ease;
+}
+
+.meet-btn-primary:hover {
+  background: var(--btn-hover);
+}
+
+.meet-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.meet-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+.meet-btn-primary:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+/* Event view */
+.meet-head .section-label {
+  margin-bottom: 6px;
+}
+
+.meet-meta {
+  font-size: 14px;
+}
+
+.meet-dim {
+  color: var(--gray-900);
+}
+
+.meet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.meet-name {
+  max-width: 240px;
+}
+
+.meet-seg {
+  display: flex;
+  flex: none;
+  padding: 3px;
+  border-radius: 9999px;
+  background: var(--gray-300);
+}
+
+.meet-seg button {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--gray-1100);
+  transition: color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.meet-seg button.on {
+  background: var(--gray-100);
+  color: var(--label);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Availability grid — same card chrome as .demo */
+.meet-card {
+  margin: 24px 0 12px;
+  border-top: 1px solid var(--gray-400);
+  border-bottom: 1px solid var(--gray-400);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.meet-scroll {
+  overflow-x: auto;
+  border-radius: inherit;
+}
+
+.meet-grid {
+  display: grid;
+  grid-template-columns: 52px repeat(var(--n), minmax(40px, 1fr));
+  grid-template-rows: 44px repeat(var(--rows), 18px);
+  min-width: calc(52px + var(--n) * 44px);
+  padding: 8px 16px 16px 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.meet-grid.editing {
+  touch-action: none;
+}
+
+.meet-day {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.meet-day .muted {
+  font-weight: 400;
+}
+
+.meet-time {
+  grid-column: 1;
+  grid-row: span 2;
+  margin-top: -5px;
+  padding-right: 8px;
+  text-align: right;
+  font-size: 11px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--gray-1000);
+}
+
+.meet-cell {
+  position: relative;
+  padding: 0;
+  border-top: 1px solid var(--gray-500);
+  border-left: 1px solid var(--gray-400);
+  outline: none;
+}
+
+.meet-cell.half {
+  border-top-color: var(--gray-300);
+}
+
+.meet-cell.last-col {
+  border-right: 1px solid var(--gray-400);
+}
+
+.meet-cell.last-row {
+  border-bottom: 1px solid var(--gray-500);
+}
+
+.meet-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gray-1200);
+  opacity: var(--p, 0);
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.meet-grid:not(.editing) .meet-cell:hover,
+.meet-cell:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--gray-900);
+  outline-offset: -1px;
+}
+
+.meet-detail {
+  min-height: 24px;
+  font-size: 14px;
+}
+
+.meet-detail b {
+  font-weight: 500;
+  color: var(--label);
+}
+
+/* Share row — the newsletter form's shape */
+.meet-share {
+  margin-top: 24px;
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--form-bg);
+  box-shadow: var(--form-shadow);
+}
+
+.meet-share:focus-within {
+  box-shadow: var(--form-ring), var(--form-shadow);
+}
+
+.meet-share input {
+  height: 100%;
+  width: 40%;
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  padding: 0 14px;
+  font-size: 14px;
+  color: var(--gray-1100);
+  text-overflow: ellipsis;
+  outline: none;
+}
+
+.meet-share button {
+  margin-right: 5px;
+  height: 38px;
+  width: 104px;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--gray-1200);
+  padding: 0 6px;
+  font-weight: 500;
+  color: var(--gray-100);
+  outline: none;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.meet-share button:hover {
+  background: var(--btn-hover);
+}
+
+.meet-share button:active {
+  transform: scale(0.97);
+}
+
+.meet-share button:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--gray-100),
+    0 0 0 4px var(--gray-1100);
+}
+
+.meet-share button span {
+  display: block;
+  white-space: nowrap;
+  transition:
+    opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    filter 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.meet-share button span.morph-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(2px);
+}
+
+.meet-share button span.morph-in {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(2px);
+  transition: none;
+}
+
+.meet-note {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.meet-best {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.meet-best li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meet-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.meet-chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  background: var(--gray-300);
+  color: var(--gray-1200);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.meet-chip:hover {
+  background: var(--gray-400);
+}
+
+.meet-chip.on,
+.meet-chip.on:hover {
+  background: var(--gray-1200);
+  color: var(--gray-100);
+}
+
+.meet-new {
+  margin-top: 48px;
+  font-weight: 400;
+  color: var(--gray-1100);
+  text-decoration: none;
+}
+
+.meet-new:hover {
+  color: var(--label);
+}
+
+@media (min-width: 640px) {
+  .meet-card {
+    border-top: none;
+    border-bottom: none;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 2px rgba(0, 0, 0, 0.04);
+  }
+}
+
+@media (max-width: 639.98px) {
+  .meet-card {
+    margin-left: -25px;
+    margin-right: -25px;
+    width: calc(100% + 50px);
+    border-radius: 0;
+  }
+
+  .meet-grid {
+    padding-right: 24px;
+  }
+
+  .meet-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .meet-name {
+    max-width: none;
+  }
+
+  .meet-seg button {
+    flex: 1;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .meet-card {
+    background: #11110e;
+  }
+
+  .meet-seg button.on {
+    box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.07);
+  }
+}
+
+@media (min-width: 640px) and (prefers-color-scheme: dark) {
+  .meet-card {
+    box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meet-cell::after,
+  .meet-cal-day,
+  .meet-chip,
+  .meet-seg button {
+    transition: none;
+  }
+
+  .meet-btn-primary:active,
+  .meet-share button:active {
+    transform: none;
+  }
+
+  .meet-share button span,
+  .meet-share button span.morph-out,
+  .meet-share button span.morph-in {
+    transform: none;
+    filter: none;
+    transition: opacity 100ms ease;
+  }
+}
