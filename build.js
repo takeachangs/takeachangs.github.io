@@ -166,14 +166,18 @@ ${posts.map((p) => listItem({ href: `/blog/${p.slug}/`, name: p.title, descripti
         </div>`,
 });
 
-// /meet/ — link-only group scheduler; the page is a shell, meet.js renders the rest
+// /meet/ — group scheduler; the page is a shell, meet.js renders the rest.
+// With site.json's meet.supabaseUrl/AnonKey set, answers live in Supabase; otherwise in the link.
+const meetStore = site.meet?.supabaseUrl && site.meet?.supabaseAnonKey ? site.meet : null;
 const meetPage = () => shell({
   title: "Meet",
-  description: `Find a time that works for everyone. A link-only scheduler by ${site.name}.`,
-  content: `        <div class="meet">
+  description: `Find a time that works for everyone. A small scheduler by ${site.name}.`,
+  content: `        <div class="meet"${meetStore ? ` data-store-url="${meetStore.supabaseUrl}" data-store-key="${meetStore.supabaseAnonKey}"` : ""}>
           <div class="meet-intro">
             <span class="section-label">Meet</span>
-            <p class="muted">Pick the days and hours that could work, share the link, and everyone paints in when they're free. There's no account and no server: every answer lives in the link itself, so always pass along the newest one.</p>
+            <p class="muted">${meetStore
+              ? "Pick the days and hours that could work, share the link, and everyone paints in when they're free. No accounts, no sign-up: a name is all it asks for."
+              : "Pick the days and hours that could work, share the link, and everyone paints in when they're free. There's no account and no server: every answer lives in the link itself, so always pass along the newest one."}</p>
             <noscript><p class="muted mt-4">This page needs JavaScript.</p></noscript>
           </div>
           <div class="meet-app"></div>

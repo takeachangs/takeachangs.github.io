@@ -1,21 +1,34 @@
-// Meet: a link-only group scheduler (/meet/). The event and every response are
-// encoded in the URL hash, so there is no backend: each person paints when
-// they're free and passes the updated link on. Responses this browser has seen
-// before are remembered (localStorage) and merged back in, so whoever collects
-// the links ends up holding the union of everyone's answers.
-// ponytail: no backend — swap `persist`/`boot` for fetches to a real store when one exists.
+// Meet: a group scheduler (/meet/). Each person paints when they're free; the
+// page shows the overlap. Two storage modes, picked at boot:
+//
+// - Store mode (when content/site.json sets meet.supabaseUrl/AnonKey): the
+//   event and every answer live in two Supabase tables (supabase/meet.sql),
+//   reached through PostgREST with plain fetch. The link is /meet/#<12-char id>
+//   and everyone who opens it sees the same thing; the page re-syncs while open.
+// - Link mode (no store configured): the event and every answer are base64url
+//   JSON in the URL hash, so a saved answer changes the link and the newest link
+//   must be passed on. Responses this browser has seen are remembered in
+//   localStorage and merged back in, so whoever collects links holds the union.
 
 (() => {
+  const root = document.querySelector('.meet');
   const app = document.querySelector('.meet-app');
   const intro = document.querySelector('.meet-intro');
-  if (!app) return;
+  if (!root || !app) return;
+
+  const STORE = root.dataset.storeUrl && root.dataset.storeKey
+    ? { url: root.dataset.storeUrl.replace(/\/+$/, ''), key: root.dataset.storeKey }
+    : null;
+  const ID_RE = /^[A-Za-z0-9]{12}$/;
+  const SYNC_MS = 15000;
 
   /* ---------- helpers ---------- */
 
   const $ = (sel, el = app) => el.querySelector(sel);
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
-  const store = {
+  const key = (n) => n.trim().toLowerCase();
+  const same = (a, b) => key(a) === key(b);
+  const local = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode etc. */ } },
   };
@@ -53,9 +66,9 @@
   };
 
   /* ---------- encoding ---------- */
-  // hash = base64url(JSON) of { v, t: title, d: [YYYY-MM-DD], s: startHour, e: endHour,
-  // z: timezone, r: [{ n: name, a: base64url bitmask of slots, t: saved-at }] }.
-  // Slot i = dayIndex * slotsPerDay + halfHourIndex.
+  // Event shape everywhere in this file: { v, t: title, d: [YYYY-MM-DD], s: startHour,
+  // e: endHour, z: timezone, r: [{ n: name, a: base64url bitmask of slots, t: saved-at }] }.
+  // Slot i = dayIndex * slotsPerDay + halfHourIndex. In link mode the hash is base64url(JSON) of it.
 
   const b64u = (bytes) => {
     let s = '';
@@ -77,21 +90,23 @@
     return Array.from({ length: n }, (_, i) => !!(bytes[i >> 3] & (1 << (i & 7))));
   };
 
+  const validEvent = (e) => e && Array.isArray(e.d) && e.d.length && e.d.length <= 62 && e.d.every((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+    && Number.isInteger(e.s) && Number.isInteger(e.e) && e.s >= 0 && e.e <= 24 && e.e > e.s;
+  const cleanResponses = (r) => (Array.isArray(r) ? r.filter((x) => x && typeof x.n === 'string' && x.n.trim() && typeof x.a === 'string' && x.a) : []);
+
   const encodeState = (e) => b64u(new TextEncoder().encode(JSON.stringify(e)));
   const decodeState = (hash) => {
     try {
       const e = JSON.parse(new TextDecoder().decode(unb64u(hash)));
-      const ok = e && e.v === 1 && Array.isArray(e.d) && e.d.length && e.d.every((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
-        && Number.isInteger(e.s) && Number.isInteger(e.e) && e.s >= 0 && e.e <= 24 && e.e > e.s;
-      if (!ok) return null;
+      if (!(e && e.v === 1 && validEvent(e))) return null;
       e.t = typeof e.t === 'string' ? e.t.slice(0, 80) : '';
       e.z = typeof e.z === 'string' ? e.z : '';
-      e.r = Array.isArray(e.r) ? e.r.filter((r) => r && typeof r.n === 'string' && r.n.trim() && typeof r.a === 'string') : [];
+      e.r = cleanResponses(e.r);
       return e;
     } catch { return null; }
   };
 
-  // Stable id for the event definition (not the responses) — the localStorage key.
+  // Stable id for a link-mode event definition (not its responses) — the localStorage key.
   const eventId = (e) => {
     let h = 5381;
     for (const ch of JSON.stringify([e.t, e.d, e.s, e.e])) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0;
@@ -102,25 +117,74 @@
   const mergeResponses = (...lists) => {
     const byName = new Map();
     for (const r of lists.flat()) {
-      const k = r.n.trim().toLowerCase();
+      const k = key(r.n);
       if (!byName.has(k) || (r.t || 0) > (byName.get(k).t || 0)) byName.set(k, r);
     }
     return [...byName.values()].sort((a, b) => (a.t || 0) - (b.t || 0));
   };
 
+  /* ---------- store (Supabase via PostgREST) ---------- */
+
+  const api = async (path, { method = 'GET', body, prefer } = {}) => {
+    const headers = { apikey: STORE.key, Authorization: `Bearer ${STORE.key}`, Accept: 'application/json' };
+    if (body) headers['Content-Type'] = 'application/json';
+    if (prefer) headers.Prefer = prefer;
+    const res = await fetch(`${STORE.url}/rest/v1/${path}`, { method, headers, body: body && JSON.stringify(body), keepalive: method !== 'GET' });
+    if (!res.ok) throw new Error(`store ${res.status}`);
+    const text = await res.text(); // return=minimal answers 201 with an empty body
+    return text ? JSON.parse(text) : null;
+  };
+
+  const newId = () => {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => alphabet[b % alphabet.length]).join('');
+  };
+
+  const rowsToResponses = (rows) => cleanResponses(rows.map((r) => ({ n: r.name, a: r.bits, t: Date.parse(r.updated_at) || 0 })));
+
+  const storeCreate = async (e) => {
+    const sid = newId();
+    await api('meet_events', { method: 'POST', prefer: 'return=minimal', body: { id: sid, title: e.t, days: e.d, start_hour: e.s, end_hour: e.e, tz: e.z } });
+    return sid;
+  };
+
+  const storeLoad = async (sid) => {
+    const [events, rows] = await Promise.all([
+      api(`meet_events?id=eq.${sid}&select=title,days,start_hour,end_hour,tz`),
+      storeResponses(sid),
+    ]);
+    const row = events[0];
+    if (!row) return null;
+    const e = { v: 1, t: String(row.title || '').slice(0, 80), d: row.days, s: row.start_hour, e: row.end_hour, z: String(row.tz || ''), r: rows };
+    return validEvent(e) ? e : null;
+  };
+
+  const storeResponses = async (sid) => rowsToResponses(await api(`meet_responses?event_id=eq.${sid}&select=name,bits,updated_at&order=updated_at`));
+
+  // Upsert one person's answer; empty bits mean "cleared".
+  const storeSave = (sid, name, bits) => api('meet_responses?on_conflict=event_id,name_key', {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=minimal',
+    body: { event_id: sid, name_key: key(name), name: name.trim(), bits },
+  });
+
   /* ---------- state ---------- */
 
   let ev = null;                              // decoded event
-  let id = '';                                // eventId(ev)
+  let id = '';                                // link mode: eventId(ev); store mode: the 12-char id
+  let storeId = '';                           // set in store mode
   let spd = 0, total = 0;                     // slots per day, total slots
   const mine = { name: '', saved: '', bits: [] };
   let mode = 'edit';                          // 'edit' | 'group'
   let focusName = '';                         // group view filtered to one person
   let cells = [];
+  let dragging = false;
+  let pending = null;                         // store mode: { [name_key]: { name, bits } } waiting to be written
+  let saveTimer = 0, syncTimer = 0, saving = false;
 
   const others = () => ev.r.filter((r) => !(mine.saved && same(r.n, mine.saved)) && !(mine.name.trim() && same(r.n, mine.name)));
 
-  // Write my answer into the event, the URL, and this browser's memory.
+  // Write my answer into the event and wherever it lives (URL + localStorage, or the store).
   function persist() {
     const name = mine.name.trim();
     const any = mine.bits.some(Boolean);
@@ -129,11 +193,60 @@
     if (!current) { // changed: drop the old entry (under either name) and append the new one
       ev.r = others();
       if (name && any) ev.r.push({ n: name, a: packed, t: Date.now() });
+      if (storeId) {
+        pending = pending || {};
+        if (mine.saved && !same(mine.saved, name)) pending[key(mine.saved)] = { name: mine.saved, bits: '' }; // renamed: clear the old row
+        if (name) pending[key(name)] = { name, bits: any ? packed : '' };
+        queueSave();
+      }
     }
     mine.saved = name && any ? name : '';
-    history.replaceState(null, '', '#' + encodeState(ev));
-    store.set('meet:' + id, { r: ev.r, me: name });
-    if (name) store.set('meet:name', name);
+    if (storeId) {
+      local.set('meet:' + storeId, { me: name });
+    } else {
+      history.replaceState(null, '', '#' + encodeState(ev));
+      local.set('meet:' + id, { r: ev.r, me: name });
+    }
+    if (name) local.set('meet:name', name);
+  }
+
+  // Store writes are debounced (typing a name fires persist per keystroke) and retried on the next sync.
+  function queueSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flush, 400);
+  }
+
+  async function flush() {
+    if (!storeId || !pending || saving) return;
+    const batch = pending;
+    pending = null;
+    saving = true;
+    try {
+      for (const { name, bits } of Object.values(batch)) await storeSave(storeId, name, bits);
+      setStatus('');
+    } catch {
+      pending = { ...batch, ...(pending || {}) }; // newer edits win over the failed batch
+      setStatus('Couldn’t save your answer. Retrying…');
+    } finally {
+      saving = false;
+      if (pending) queueSave(); // edits that arrived mid-flight
+    }
+  }
+
+  // Store mode: pull everyone else's answers while the tab is open.
+  async function sync() {
+    if (!storeId || document.hidden || dragging) return;
+    let rows;
+    try { rows = await storeResponses(storeId); } catch { return; }
+    if (pending) flush();
+    const me = mine.saved ? [ev.r.find((r) => same(r.n, mine.saved))].filter(Boolean) : [];
+    const next = [...rows.filter((r) => !me.some((m) => same(m.n, r.n))), ...me];
+    if (JSON.stringify(next) !== JSON.stringify(ev.r)) { ev.r = next; refresh(); }
+  }
+
+  function setStatus(text) {
+    const el = $('.meet-status');
+    if (el) el.textContent = text;
   }
 
   /* ---------- create view ---------- */
@@ -172,6 +285,7 @@
           <select class="meet-field" id="meet-end" aria-label="To">${hourOptions(1, 24, 17)}</select>
         </div>
         <button type="submit" class="meet-btn-primary" disabled><span>Create event</span></button>
+        <p class="muted meet-status" aria-live="polite"></p>
       </form>`;
 
     const form = $('.meet-create');
@@ -179,6 +293,7 @@
     const submit = $('.meet-btn-primary');
     const start = $('#meet-start');
     const end = $('#meet-end');
+    let creating = false;
 
     const drawCal = () => {
       $('.meet-cal-month').textContent = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -192,7 +307,7 @@
         html += `<button type="button" class="${cls}" data-date="${iso}"${d === 1 ? ` style="grid-column-start:${date.getDay() + 1}"` : ''}${date < today ? ' disabled' : ''} aria-pressed="${picked.has(iso)}" aria-label="${fmtDate(iso, { weekday: 'long', month: 'long', day: 'numeric' })}">${d}</button>`;
       }
       cal.innerHTML = html;
-      submit.disabled = picked.size === 0;
+      submit.disabled = picked.size === 0 || creating;
     };
 
     // Toggle every selectable day between two dates (inclusive), in drag mode.
@@ -240,14 +355,34 @@
     start.addEventListener('change', () => { if (+end.value <= +start.value) end.value = +start.value + 1; });
     end.addEventListener('change', () => { if (+end.value <= +start.value) start.value = +end.value - 1; });
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!picked.size) return;
+      if (!picked.size || creating) return;
       const event = { v: 1, t: $('#meet-title').value.trim(), d: [...picked].sort(), s: +start.value, e: +end.value, z: timeZone(), r: [] };
-      location.hash = encodeState(event); // hashchange → boot() renders the event
+      if (!STORE) { location.hash = encodeState(event); return; } // hashchange → boot() renders the event
+      creating = true;
+      submit.disabled = true;
+      setStatus('');
+      try {
+        location.hash = await storeCreate(event);
+      } catch {
+        setStatus('Couldn’t reach the store. Check your connection and try again.');
+        creating = false;
+        submit.disabled = false;
+      }
     });
 
     drawCal();
+  }
+
+  function renderError(text) {
+    intro.hidden = false;
+    document.title = 'Meet';
+    app.innerHTML = `
+      <p class="muted meet-status">${esc(text)}</p>
+      <button type="button" class="meet-btn-primary meet-retry"><span>Try again</span></button>
+      <a class="arrow-link meet-new" href="/meet/">New event${ARROW}</a>`;
+    $('.meet-retry').addEventListener('click', boot);
   }
 
   /* ---------- event view ---------- */
@@ -271,7 +406,7 @@
     const tz = ev.z ? ` · Times in ${ev.z.replace(/_/g, ' ')}` : '';
     const here = timeZone();
     const warn = ev.z && here && here !== ev.z ? ` <span class="meet-dim">(you're in ${here.replace(/_/g, ' ')})</span>` : '';
-    return `${range} · ${fmtHour(ev.s)} – ${fmtHour(ev.e)}${tz}${warn}`;
+    return `${esc(range)} · ${fmtHour(ev.s)} – ${fmtHour(ev.e)}${esc(tz)}${warn}`;
   };
 
   function renderEvent() {
@@ -297,6 +432,7 @@
         <button type="button"><span>Copy link</span></button>
       </div>
       <p class="muted meet-note"></p>
+      <p class="muted meet-status" aria-live="polite"></p>
       <div class="meet-block meet-best-block">
         <span class="meet-label">Best times</span>
         <ul class="meet-best"></ul>
@@ -336,7 +472,6 @@
   function wire() {
     const g = $('.meet-grid');
     const name = $('.meet-name');
-    const detail = $('.meet-detail');
     let drag = null;
 
     // Paint a rectangle from the anchor cell to the current one, on top of the pre-drag snapshot.
@@ -356,6 +491,7 @@
       g.setPointerCapture(e.pointerId);
       const i = +cell.dataset.i;
       drag = { anchor: i, mode: !mine.bits[i], snapshot: mine.bits.slice() };
+      dragging = true;
       applyDrag(i);
     });
     g.addEventListener('pointermove', (e) => {
@@ -366,6 +502,7 @@
     const endDrag = () => {
       if (!drag) return;
       drag = null;
+      dragging = false;
       persist();
       refresh();
     };
@@ -390,7 +527,7 @@
       mine.name = name.value;
       // Same name as an existing answer and nothing painted yet: that's you, back on another device.
       const existing = ev.r.find((r) => mine.name.trim() && same(r.n, mine.name));
-      if (existing && !mine.bits.some(Boolean)) mine.bits = unpackBits(existing.a, total);
+      if (existing && !mine.bits.some(Boolean)) { mine.bits = unpackBits(existing.a, total); mine.saved = existing.n; }
       persist();
       refresh();
     });
@@ -421,7 +558,6 @@
         morph(label, 'Press ⌘C', 'Copy link');
       }
     });
-    detail.textContent = '';
   }
 
   function setMode(m) {
@@ -515,10 +651,12 @@
     const name = mine.name.trim();
     const any = mine.bits.some(Boolean);
     $('.meet-note').textContent = !name && any
-      ? 'Add your name above to include your answer in the link.'
-      : name && any
-        ? 'Your answer is in this link. Send it on — whoever opens it sees everyone so far.'
-        : 'Share this link and everyone can add when they’re free.';
+      ? 'Add your name above to save your answer.'
+      : storeId
+        ? 'Anyone with this link can add when they’re free. Answers show up for everyone within a few seconds.'
+        : name && any
+          ? 'Your answer is in this link. Send it on — whoever opens it sees everyone so far.'
+          : 'Share this link and everyone can add when they’re free.';
 
     const best = bestTimes();
     $('.meet-best-block').hidden = !best.length;
@@ -535,27 +673,58 @@
 
   /* ---------- boot ---------- */
 
-  function boot() {
-    const hash = location.hash.slice(1);
-    ev = hash ? decodeState(hash) : null;
-    if (!ev) { renderCreate(); return; }
-
-    id = eventId(ev);
+  function startEvent() {
     spd = (ev.e - ev.s) * 2;
     total = ev.d.length * spd;
-
-    const local = store.get('meet:' + id) || {};
-    ev.r = mergeResponses(ev.r, Array.isArray(local.r) ? local.r : []);
-    mine.name = typeof local.me === 'string' ? local.me : (store.get('meet:name') || '');
     const own = mine.name.trim() && ev.r.find((r) => same(r.n, mine.name));
     mine.bits = own ? unpackBits(own.a, total) : new Array(total).fill(false);
     mine.saved = own ? own.n : '';
     focusName = '';
-
     persist();
     renderEvent();
   }
 
+  async function boot() {
+    clearInterval(syncTimer);
+    clearTimeout(saveTimer);
+    storeId = '';
+    pending = null;
+    const hash = location.hash.slice(1);
+
+    if (STORE && ID_RE.test(hash)) {
+      renderLoading();
+      try { ev = await storeLoad(hash); } catch { renderError('Couldn’t load this event. The store may be waking up — try again in a moment.'); return; }
+      if (hash !== location.hash.slice(1)) return; // navigated away while loading
+      if (!ev) { renderError('This event doesn’t exist, or the link is incomplete.'); return; }
+      storeId = id = hash;
+      const saved = local.get('meet:' + storeId) || {};
+      mine.name = typeof saved.me === 'string' ? saved.me : (local.get('meet:name') || '');
+      startEvent();
+      syncTimer = setInterval(sync, SYNC_MS);
+      return;
+    }
+
+    ev = hash ? decodeState(hash) : null;
+    if (!ev) {
+      if (hash && ID_RE.test(hash)) renderError('This link needs a store this page isn’t configured for.');
+      else renderCreate();
+      return;
+    }
+    id = eventId(ev);
+    const saved = local.get('meet:' + id) || {};
+    ev.r = mergeResponses(ev.r, cleanResponses(saved.r));
+    mine.name = typeof saved.me === 'string' ? saved.me : (local.get('meet:name') || '');
+    startEvent();
+  }
+
+  function renderLoading() {
+    intro.hidden = true;
+    app.innerHTML = '<p class="muted meet-status">Loading…</p>';
+  }
+
   window.addEventListener('hashchange', boot);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+  window.addEventListener('focus', sync);
+  window.addEventListener('pagehide', () => { if (pending) flush(); });
   boot();
 })();
