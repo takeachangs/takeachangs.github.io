@@ -15,6 +15,11 @@
   ],
   "projects": [
     {
+      "name": "Mike",
+      "description": "A Mac app in the MacBook notch for voice calls, on-device lecture transcription, and a library of both.",
+      "href": "https://github.com/takeachangs/mike"
+    },
+    {
       "name": "Huddle",
       "description": "An MCP daemon routing custom Claude Code channels across repos.",
       "href": "https://github.com/takeachangs/huddle"
