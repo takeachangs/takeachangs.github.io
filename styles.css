@@ -1879,6 +1879,7 @@ select.meet-field {
 /* /made/<slug>/: a project page. The icon sits where a post's first line would. */
 .made-icon {
   display: block;
+  margin-inline: auto;
   width: 96px;
   height: 96px;
   margin-bottom: 28px;
