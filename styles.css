@@ -1875,3 +1875,11 @@ select.meet-field {
     transition: opacity 100ms ease;
   }
 }
+
+/* /made/<slug>/: a project page. The icon sits where a post's first line would. */
+.made-icon {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 28px;
+}
