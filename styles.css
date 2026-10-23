@@ -1884,3 +1884,7 @@ select.meet-field {
   height: 96px;
   margin-bottom: 28px;
 }
+
+.made > .section-label {
+  text-align: center;
+}
