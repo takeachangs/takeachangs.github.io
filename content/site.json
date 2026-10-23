@@ -33,11 +33,6 @@
       "name": "Decentralized Meta-Analysis",
       "description": "A multi-agent framework that turns academic papers into personified agents that debate each other to synthesize unbiased meta-analyses.",
       "href": "https://github.com/takeachangs/multiagent-meta-analysis"
-    },
-    {
-      "name": "Playground",
-      "description": "Prototypes and unfinished ideas.",
-      "href": "#"
     }
   ],
   "newsletter": {
