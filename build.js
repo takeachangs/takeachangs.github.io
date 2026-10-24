@@ -1,4 +1,4 @@
-// Static site build: content/*.json + content/posts/*.md -> index.html + blog/<slug>/index.html + meet/index.html
+// Static site build: content/*.json + content/posts/*.md + content/made/*.md -> index.html + blog/<slug>/ + made/<slug>/ + meet/
 // Run: node build.js
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
 import { Marked } from "./lib/marked.esm.js";
@@ -7,8 +7,8 @@ const site = JSON.parse(readFileSync("content/site.json", "utf8"));
 
 /* ---------- posts ---------- */
 
-function parsePost(file) {
-  const raw = readFileSync(`content/posts/${file}`, "utf8");
+function parseMd(dir, file) {
+  const raw = readFileSync(`content/${dir}/${file}`, "utf8");
   const m = raw.match(/^---\n([\s\S]*?)\n---\n?/);
   const meta = {};
   for (const line of m[1].split("\n")) {
@@ -18,10 +18,14 @@ function parsePost(file) {
   return { ...meta, slug: file.replace(/\.md$/, ""), body: raw.slice(m[0].length) };
 }
 
-const posts = readdirSync("content/posts")
-  .filter((f) => f.endsWith(".md"))
-  .map(parsePost)
-  .sort((a, b) => b.date.localeCompare(a.date));
+const mdFiles = (dir) => readdirSync(`content/${dir}`).filter((f) => f.endsWith(".md")).map((f) => parseMd(dir, f));
+
+const posts = mdFiles("posts").sort((a, b) => b.date.localeCompare(a.date));
+
+/* ---------- made ---------- */
+// content/made/<slug>.md -> /made/<slug>/: a project page (icon, name, a few lines, a download link).
+// A project in site.json links to it by setting href to "/made/<slug>/".
+const made = mdFiles("made");
 
 /* ---------- markdown ---------- */
 
@@ -127,7 +131,7 @@ ${site.today.map((p, i) => `        <p class="muted${i ? " mt-4" : ""}">${p}</p>
         <div class="list-section">
           <span class="section-label list-label">Projects/Researches</span>
           <div class="list">
-${site.projects.map((p) => listItem({ href: p.href, name: p.name, description: p.description, external: true })).join("\n")}
+${site.projects.map((p) => listItem({ href: p.href, name: p.name, description: p.description, external: /^https?:/.test(p.href) })).join("\n")}
           </div>
         </div>
 
@@ -195,6 +199,18 @@ ${marked.parse(post.body).replace(/<p>(<demo-[\w-]+[^>]*><\/demo-[\w-]+>)<\/p>/g
   scripts: `\n    <script src="/widgets.js" defer></script>`,
 });
 
+const madePage = (page) => shell({
+  title: page.title,
+  description: page.description,
+  content: `        <div class="made">
+          ${page.icon ? `<img class="made-icon" src="${page.icon}" alt="" width="96" height="96" />` : ""}
+          <span class="section-label">${page.title}</span>
+          <div class="article">
+${marked.parse(page.body)}
+          </div>
+        </div>`,
+});
+
 /* ---------- write ---------- */
 
 writeFileSync("index.html", homepage());
@@ -207,4 +223,9 @@ for (const post of posts) {
   mkdirSync(`blog/${post.slug}`, { recursive: true });
   writeFileSync(`blog/${post.slug}/index.html`, postPage(post));
 }
-console.log(`built index.html + ${posts.length} posts + meet/`);
+rmSync("made", { recursive: true, force: true });
+for (const page of made) {
+  mkdirSync(`made/${page.slug}`, { recursive: true });
+  writeFileSync(`made/${page.slug}/index.html`, madePage(page));
+}
+console.log(`built index.html + ${posts.length} posts + ${made.length} made + meet/`);

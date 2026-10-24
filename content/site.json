@@ -15,6 +15,11 @@
   ],
   "projects": [
     {
+      "name": "Mike",
+      "description": "A Mac app in the MacBook notch for voice calls, on-device lecture transcription, and a library of both.",
+      "href": "/made/mike/"
+    },
+    {
       "name": "Huddle",
       "description": "An MCP daemon routing custom Claude Code channels across repos.",
       "href": "https://github.com/takeachangs/huddle"
@@ -28,11 +33,6 @@
       "name": "Decentralized Meta-Analysis",
       "description": "A multi-agent framework that turns academic papers into personified agents that debate each other to synthesize unbiased meta-analyses.",
       "href": "https://github.com/takeachangs/multiagent-meta-analysis"
-    },
-    {
-      "name": "Playground",
-      "description": "Prototypes and unfinished ideas.",
-      "href": "#"
     }
   ],
   "newsletter": {
